@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイカンパニー スターターキット</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface2: #22222f;
+    --border: #2e2e42;
+    --accent: #7c6cfc;
+    --accent2: #4fc9a4;
+    --accent3: #f5a623;
+    --text: #e8e8f0;
+    --muted: #8888a8;
+    --slide-w: 1100px;
+    --slide-h: 620px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Helvetica Neue', 'Hiragino Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .deck {
+    position: relative;
+    width: var(--slide-w);
+    height: var(--slide-h);
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 52px 60px;
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeIn .25s ease;
+  }
+  .slide.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .nav button {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background .15s;
+  }
+  .nav button:hover { background: var(--border); }
+  .nav button:disabled { opacity: .3; cursor: default; }
+  .slide-count { margin: 0 auto; }
+
+  /* COMMON */
+  .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 { font-size: 42px; font-weight: 800; line-height: 1.15; }
+  h2 { font-size: 28px; font-weight: 700; }
+  .sub { color: var(--muted); font-size: 15px; line-height: 1.7; }
+  .tag {
+    display: inline-block;
+    background: rgba(124,108,252,.15);
+    border: 1px solid rgba(124,108,252,.3);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* SLIDE 1 — COVER */
+  .cover-kicker { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+  .cover h1 { font-size: 52px; }
+  .cover-body { color: var(--muted); font-size: 17px; line-height: 1.8; max-width: 600px; }
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .cover-accent {
+    position: absolute;
+    right: 60px; top: 50%;
+    transform: translateY(-50%);
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(124,108,252,.18) 0%, transparent 70%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px;
+  }
+
+  /* SLIDE 2 — CONCEPT */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex: 1;
+  }
+  .concept-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .concept-icon { font-size: 28px; }
+  .concept-title { font-size: 16px; font-weight: 700; }
+  .concept-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* SLIDE 3 — DEPARTMENTS */
+  .dept-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    flex: 1;
+  }
+  .dept-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dept-card .icon { font-size: 24px; }
+  .dept-card .name { font-size: 14px; font-weight: 700; }
+  .dept-card .role { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .dept-card.accent { border-color: rgba(124,108,252,.4); }
+
+  /* SLIDE 4 — SKILLS */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    flex: 1;
+  }
+  .skill-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .skill-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .skill-icon.purple { background: rgba(124,108,252,.15); }
+  .skill-icon.green  { background: rgba(79,201,164,.15); }
+  .skill-icon.orange { background: rgba(245,166,35,.15); }
+  .skill-icon.pink   { background: rgba(252,108,160,.15); }
+  .skill-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .skill-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* SLIDE 5 — SETUP */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-body { display: flex; flex-direction: column; gap: 4px; }
+  .step-title { font-size: 15px; font-weight: 700; }
+  .step-detail { font-size: 12px; color: var(--muted); }
+  .code {
+    display: inline-block;
+    background: rgba(124,108,252,.12);
+    border: 1px solid rgba(124,108,252,.2);
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: #a89dff;
+  }
+
+  /* SLIDE 6 — COMMANDS */
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    flex: 1;
+  }
+  .cmd-group {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cmd-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 2px;
+  }
+  .cmd-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .cmd-row .cmd { font-family: monospace; color: #a89dff; white-space: nowrap; flex-shrink: 0; }
+  .cmd-row .desc { color: var(--muted); font-size: 12px; }
+
+  /* SLIDE 7 — STRUCTURE */
+  .tree {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 2;
+    color: var(--muted);
+    flex: 1;
+    display: flex;
+    gap: 40px;
+  }
+  .tree-col { flex: 1; }
+  .tree .d { color: var(--accent); font-weight: 600; }
+  .tree .f { color: var(--text); }
+  .tree .cm { color: var(--muted); font-size: 11px; }
+
+  /* SLIDE 8 — MAINTENANCE */
+  .maint-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    flex: 1;
+  }
+  .maint-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .maint-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .maint-list { display: flex; flex-direction: column; gap: 6px; }
+  .maint-item {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .maint-item::before {
+    content: '›';
+    position: absolute; left: 0;
+    color: var(--accent);
+  }
+
+  /* SLIDE 9 — PIXEL OFFICE */
+  .po-wrap {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 24px;
+    flex: 1;
+    align-items: center;
+  }
+  .po-screen {
+    background: #0d0d18;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .po-screen .title { color: var(--accent); font-size: 14px; font-weight: bold; margin-bottom: 8px; }
+  .po-dept { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .po-dept .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .po-dept .status-dot.working { background: var(--accent2); }
+  .po-dept .status-dot.idle { background: var(--muted); }
+  .po-dept .dname { color: var(--text); font-size: 12px; flex: 1; }
+  .po-dept .dstatus { font-size: 10px; color: var(--muted); }
+  .po-info { display: flex; flex-direction: column; gap: 14px; }
+  .po-info-item { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .po-info-item strong { color: var(--text); display: block; margin-bottom: 3px; }
+
+  /* SLIDE 10 — END */
+  .end-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 20px;
+    text-align: center;
+  }
+  .end-icon { font-size: 56px; }
+  .end-tagline { font-size: 32px; font-weight: 800; line-height: 1.3; }
+  .end-sub { color: var(--muted); font-size: 15px; max-width: 500px; line-height: 1.7; }
+  .end-cmd {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 28px;
+    font-family: monospace;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: .05em;
+  }
+
+  /* SLIDE NUM BADGE */
+  .slide-badge {
+    position: absolute;
+    top: 20px; right: 24px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ① COVER -->
+  <div class="slide cover active">
+    <div class="slide-badge">01 / 10</div>
+    <div class="cover-kicker">Starter Kit</div>
+    <h1>マイカンパニー<br>スターターキット</h1>
+    <div class="cover-body">
+      Claude Code で動く、自分だけの仮想組織システム。<br>
+      7部署・9スキルが最初から揃っている。
+    </div>
+    <div class="pill-row">
+      <span class="pill">🗂️ 秘書室</span>
+      <span class="pill">📊 マーケ</span>
+      <span class="pill">💻 開発部</span>
+      <span class="pill">📋 PM</span>
+      <span class="pill">🔍 リサーチ</span>
+      <span class="pill">💰 会計</span>
+      <span class="pill">🛡️ セキュリティ</span>
+    </div>
+    <div class="cover-accent">🏢</div>
+  </div>
+
+  <!-- ② CONCEPT -->
+  <div class="slide">
+    <div class="slide-badge">02 / 10</div>
+    <div class="label">Concept</div>
+    <h2>このキットが解決すること</h2>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">🧠</div>
+        <div class="concept-title">記憶が続かない問題</div>
+        <div class="concept-desc">タスク・日記・会議録・アイデアをすべてMarkdownファイルに永続化。Claude が毎回「どこ？」と迷わない。</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔀</div>
+        <div class="concept-title">何でも屋になってしまう問題</div>
+        <div class="concept-desc">7つの部署に役割を分けて委任。秘書・PM・開発を「別人格」として使い分けられる。</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">⚡</div>
+        <div class="concept-title">毎回セットアップが面倒な問題</div>
+        <div class="concept-desc">CLAUDE.md にルールを集約。新しい会話でもコンテキストが即復活する。</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔌</div>
+        <div class="concept-title">専門タスクに対応できない問題</div>
+        <div class="concept-desc">必要なスキルを後からインストールして拡張できる。自分だけの組織に育てられる。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ DEPARTMENTS -->
+  <div class="slide">
+    <div class="slide-badge">03 / 10</div>
+    <div class="label">Structure</div>
+    <h2>7つの部署</h2>
+    <div class="dept-grid">
+      <div class="dept-card accent">
+        <div class="icon">🗂️</div>
+        <div class="name">秘書室</div>
+        <div class="role">タスク・メモ・日記・議事録・アイデア管理。毎日の起点になる中核部署。</div>
+      </div>
+      <div class="dept-card">
+        <div class="icon">📊</div>
+        <div class="name">マーケティング</div>
+        <div class="role">コンテンツ企画・LP・施策管理。キャンペーンの設計と記録。</div>
+      </div>
+      <div class="dept-card">
+        <div class="icon">💻</div>
+        <div class="name">開発部</div>
+        <div class="role">技術ドキュメント・デバッグログ・スクリプト管理。</div>
+      </div>
+      <div class="dept-card">
+        <div class="icon">📋</div>
+        <div class="name">PM</div>
+        <div class="role">プロジェクト管理・チケット管理。要件定義から進捗追跡まで。</div>
+      </div>
+      <div class="dept-card">
+        <div class="icon">🔍</div>
+        <div class="name">リサーチ部</div>
+        <div class="role">市場調査・競合分析・トレンドリサーチの蓄積庫。</div>
+      </div>
+      <div class="dept-card">
+        <div class="icon">💰</div>
+        <div class="name">会計部</div>
+        <div class="role">PL・CF・BS・経費・予算のテンプレートが揃っている。</div>
+      </div>
+      <div class="dept-card">
+        <div class="icon">🛡️</div>
+        <div class="name">セキュリティ</div>
+        <div class="role">設定監査・危険コマンドのブロック設定管理。</div>
+      </div>
+      <div class="dept-card" style="background:transparent; border-color:transparent; align-items:center; justify-content:center; color:var(--muted); font-size:13px; text-align:center;">
+        + 追加は<br>フォルダを置くだけ
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ SKILLS -->
+  <div class="slide">
+    <div class="slide-badge">04 / 10</div>
+    <div class="label">Skills</div>
+    <h2>9つの組み込みスキル</h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon purple">🎯</div>
+        <div>
+          <div class="skill-name">/coordinator</div>
+          <div class="skill-desc">複数部署にまたがる依頼を受けて全体を指揮する司令塔。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon purple">💻</div>
+        <div>
+          <div class="skill-name">/developer</div>
+          <div class="skill-desc">コード実装・バグ修正・リファクタリングを担うエンジニア。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon purple">🏗️</div>
+        <div>
+          <div class="skill-name">/system-architect</div>
+          <div class="skill-desc">システム設計・技術スタック選定・アーキテクチャ設計。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon green">📋</div>
+        <div>
+          <div class="skill-name">/product-manager</div>
+          <div class="skill-desc">PRD・要件定義・ユーザーストーリー・優先度付け。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon green">📐</div>
+        <div>
+          <div class="skill-name">/breakdown-plan</div>
+          <div class="skill-desc">Epic → Feature → Story の階層でタスク分解・実行計画を生成。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon orange">💡</div>
+        <div>
+          <div class="skill-name">/marketing-ideas</div>
+          <div class="skill-desc">SaaS・プロダクトのグロース施策アイデアを網羅的に出す。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon orange">🎨</div>
+        <div>
+          <div class="skill-name">/ui-ux-pro-max</div>
+          <div class="skill-desc">50+スタイル・161パレット対応のUI/UXデザインインテリジェンス。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon pink">🛡️</div>
+        <div>
+          <div class="skill-name">/security-review</div>
+          <div class="skill-desc">OWASP準拠のコードセキュリティ監査。脆弱性を信頼スコア付きで報告。</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon green">🔌</div>
+        <div>
+          <div class="skill-name">/find-skills</div>
+          <div class="skill-desc">足りないスキルを検索してインストール。組織を自分用に拡張できる。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ SETUP -->
+  <div class="slide">
+    <div class="slide-badge">05 / 10</div>
+    <div class="label">Setup</div>
+    <h2>セットアップ手順（5分）</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">リポジトリをクローン</div>
+          <div class="step-detail"><span class="code">git clone https://github.com/YOUR_REPO/teru-company-starter.git mycompany</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Claude Code を起動</div>
+          <div class="step-detail">プロジェクトフォルダで <span class="code">claude</span> を実行。または VS Code の Claude Code 拡張から開く。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">オーナープロフィールを設定</div>
+          <div class="step-detail"><span class="code">.company/CLAUDE.md</span> を開き、「事業・活動」「目標・課題」を書き換える。これだけで完了。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">日本語で話しかける</div>
+          <div class="step-detail">「タスク追加 〇〇」「アイデア 〇〇」「MTG 〇〇」と送るだけで動き始める。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ COMMANDS -->
+  <div class="slide">
+    <div class="slide-badge">06 / 10</div>
+    <div class="label">Usage</div>
+    <h2>よく使うコマンド</h2>
+    <div class="cmd-grid">
+      <div class="cmd-group">
+        <div class="cmd-group-title">日常タスク管理</div>
+        <div class="cmd-row"><span class="cmd">タスク追加 [内容]</span><span class="desc">今日のTODOに追加</span></div>
+        <div class="cmd-row"><span class="cmd">今日のタスク</span><span class="desc">TODOを表示</span></div>
+        <div class="cmd-row"><span class="cmd">メモ [内容]</span><span class="desc">inboxにクイックキャプチャ</span></div>
+        <div class="cmd-row"><span class="cmd">日記</span><span class="desc">今日の日記を書く</span></div>
+        <div class="cmd-row"><span class="cmd">週次レビュー</span><span class="desc">週次レビューを生成</span></div>
+      </div>
+      <div class="cmd-group">
+        <div class="cmd-group-title">企画・プロジェクト</div>
+        <div class="cmd-row"><span class="cmd">アイデア [タイトル]</span><span class="desc">アイデアファイル新規作成</span></div>
+        <div class="cmd-row"><span class="cmd">MTG [タイトル]</span><span class="desc">議事録ファイル新規作成</span></div>
+        <div class="cmd-row"><span class="cmd">調査 [タイトル]</span><span class="desc">リサーチファイル新規作成</span></div>
+        <div class="cmd-row"><span class="cmd">ダッシュボード</span><span class="desc">全体概要を表示</span></div>
+        <div class="cmd-row"><span class="cmd">ブリーフィング</span><span class="desc">最新ニュースのまとめ</span></div>
+      </div>
+      <div class="cmd-group">
+        <div class="cmd-group-title">スキル直接呼び出し</div>
+        <div class="cmd-row"><span class="cmd">/developer</span><span class="desc">コード実装・バグ修正</span></div>
+        <div class="cmd-row"><span class="cmd">/product-manager</span><span class="desc">要件定義・PRD</span></div>
+        <div class="cmd-row"><span class="cmd">/breakdown-plan</span><span class="desc">タスク分解・実行計画</span></div>
+        <div class="cmd-row"><span class="cmd">/security-review</span><span class="desc">セキュリティ監査</span></div>
+      </div>
+      <div class="cmd-group">
+        <div class="cmd-group-title">拡張・カスタマイズ</div>
+        <div class="cmd-row"><span class="cmd">/find-skills</span><span class="desc">新スキルを検索・インストール</span></div>
+        <div class="cmd-row"><span class="cmd">/coordinator</span><span class="desc">複数部署をまたぐ大型依頼</span></div>
+        <div class="cmd-row"><span class="cmd">/marketing-ideas</span><span class="desc">施策アイデアブレスト</span></div>
+        <div class="cmd-row"><span class="cmd">/ui-ux-pro-max</span><span class="desc">UI/UXデザイン</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ STRUCTURE -->
+  <div class="slide">
+    <div class="slide-badge">07 / 10</div>
+    <div class="label">Files</div>
+    <h2>ディレクトリ構成</h2>
+    <div class="tree">
+      <div class="tree-col">
+        <div><span class="d">mycompany/</span></div>
+        <div>├── <span class="f">CLAUDE.md</span> <span class="cm">← 全体ルール</span></div>
+        <div>├── <span class="f">README.md</span></div>
+        <div>├── <span class="f">.gitignore</span></div>
+        <div>└── <span class="d">.agents/skills/</span></div>
+        <div>&nbsp;&nbsp;&nbsp; ├── coordinator/</div>
+        <div>&nbsp;&nbsp;&nbsp; ├── developer/</div>
+        <div>&nbsp;&nbsp;&nbsp; ├── system-architect/</div>
+        <div>&nbsp;&nbsp;&nbsp; ├── product-manager/</div>
+        <div>&nbsp;&nbsp;&nbsp; ├── breakdown-plan/</div>
+        <div>&nbsp;&nbsp;&nbsp; ├── marketing-ideas/</div>
+        <div>&nbsp;&nbsp;&nbsp; ├── ui-ux-pro-max/</div>
+        <div>&nbsp;&nbsp;&nbsp; ├── security-review/</div>
+        <div>&nbsp;&nbsp;&nbsp; └── find-skills/</div>
+      </div>
+      <div class="tree-col">
+        <div><span class="d">.company/</span></div>
+        <div>├── <span class="f">CLAUDE.md</span> <span class="cm">← 組織ルール</span></div>
+        <div>├── <span class="d">secretary/</span> <span class="cm">← todos, diary, ideas…</span></div>
+        <div>├── <span class="d">marketing/</span> <span class="cm">← content-plan, lp…</span></div>
+        <div>├── <span class="d">engineering/</span> <span class="cm">← docs, scripts…</span></div>
+        <div>├── <span class="d">pm/</span> <span class="cm">← projects, tickets…</span></div>
+        <div>├── <span class="d">research/</span> <span class="cm">← topics…</span></div>
+        <div>├── <span class="d">finance/</span> <span class="cm">← pl, cf, bs…</span></div>
+        <div>├── <span class="d">security/</span></div>
+        <div>└── <span class="d">pixel-office/</span> <span class="cm">← 稼働状況ダッシュボード</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑧ MAINTENANCE -->
+  <div class="slide">
+    <div class="slide-badge">08 / 10</div>
+    <div class="label">Maintenance</div>
+    <h2>運用・保守のしかた</h2>
+    <div class="maint-grid">
+      <div class="maint-card">
+        <div class="maint-title">🔄 日次メンテナンス</div>
+        <div class="maint-list">
+          <div class="maint-item">「今日のタスク」で秘書室の状態確認</div>
+          <div class="maint-item">完了タスクはチェック→秘書が自動アーカイブ</div>
+          <div class="maint-item">メモ・アイデアは inbox に投げるだけでOK</div>
+        </div>
+      </div>
+      <div class="maint-card">
+        <div class="maint-title">📅 週次メンテナンス</div>
+        <div class="maint-list">
+          <div class="maint-item">「週次レビュー」で1週間の成果を振り返る</div>
+          <div class="maint-item">pixel-office の <span class="code">update_data.py</span> を実行して稼働状況を更新</div>
+          <div class="maint-item">古い inbox のメモを各部署に仕分け</div>
+        </div>
+      </div>
+      <div class="maint-card">
+        <div class="maint-title">🔌 スキルの追加・更新</div>
+        <div class="maint-list">
+          <div class="maint-item"><span class="code">/find-skills</span> でスキルを検索・インストール</div>
+          <div class="maint-item">古いスキルは <span class="code">.agents/skills/</span> から手動削除</div>
+          <div class="maint-item">部署追加は <span class="code">.company/新部署/CLAUDE.md</span> を置くだけ</div>
+        </div>
+      </div>
+      <div class="maint-card">
+        <div class="maint-title">🛡️ セキュリティ</div>
+        <div class="maint-list">
+          <div class="maint-item">APIキー・パスワードは絶対にファイルに書かない</div>
+          <div class="maint-item">環境変数 or <span class="code">.env</span>（.gitignoreに追加済み）を使う</div>
+          <div class="maint-item"><span class="code">/security-review</span> でコードを定期監査</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑨ PIXEL OFFICE -->
+  <div class="slide">
+    <div class="slide-badge">09 / 10</div>
+    <div class="label">Bonus</div>
+    <h2>バーチャルオフィス（pixel-office）</h2>
+    <div class="po-wrap">
+      <div class="po-screen">
+        <div class="title">🏢 マイカンパニー ダッシュボード</div>
+        <div class="po-dept"><span class="status-dot working"></span><span class="dname">🗂️ 秘書室</span><span class="dstatus">● WORKING</span></div>
+        <div class="po-dept"><span class="status-dot working"></span><span class="dname">📊 マーケティング</span><span class="dstatus">● WORKING</span></div>
+        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">💻 開発部</span><span class="dstatus">◌ IDLE</span></div>
+        <div class="po-dept"><span class="status-dot working"></span><span class="dname">📋 PM</span><span class="dstatus">● BUSY</span></div>
+        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">🔍 リサーチ部</span><span class="dstatus">◌ IDLE</span></div>
+        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">💰 会計部</span><span class="dstatus">◌ IDLE</span></div>
+        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">🛡️ セキュリティ</span><span class="dstatus">✓ DONE</span></div>
+      </div>
+      <div class="po-info">
+        <div class="po-info-item">
+          <strong>起動方法</strong>
+          <span class="code">cd .company/pixel-office</span><br>
+          <span class="code">python3 server.py</span><br>
+          → <span class="code">http://localhost:8080</span> で確認
+        </div>
+        <div class="po-info-item">
+          <strong>データ更新</strong>
+          <span class="code">python3 update_data.py</span> を実行すると<br>
+          各部署のタスク状況が自動反映される
+        </div>
+        <div class="po-info-item">
+          <strong>カスタマイズ</strong>
+          <span class="code">data.json</span> を直接編集して<br>
+          独自の部署・ステータスを追加できる
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑩ END -->
+  <div class="slide">
+    <div class="slide-badge">10 / 10</div>
+    <div class="end-wrap">
+      <div class="end-icon">🚀</div>
+      <div class="end-tagline">あとはプロフィールを<br>書き換えるだけ</div>
+      <div class="end-sub">
+        <span class="code">.company/CLAUDE.md</span> の「オーナープロフィール」を<br>
+        自分の事業・目標に書き換えれば、組織が動き出す。
+      </div>
+      <div class="end-cmd">claude</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button id="prev" onclick="go(-1)" disabled>← 前へ</button>
+  <span class="slide-count" id="count">1 / 10</span>
+  <button id="next" onclick="go(1)">次へ →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  function go(d) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(slides.length - 1, cur + d));
+    slides[cur].classList.add('active');
+    document.getElementById('count').textContent = (cur + 1) + ' / ' + slides.length;
+    document.getElementById('prev').disabled = cur === 0;
+    document.getElementById('next').disabled = cur === slides.length - 1;
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+  });
+</script>
+</body>
+</html>
