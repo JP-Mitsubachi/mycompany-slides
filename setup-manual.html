@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity + Claude Code 自立型エージェント セットアップガイド</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.8;
+            color: #1a1a2e;
+            background: #f8f9fc;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.02em;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+        .hero .links a {
+            color: #fff;
+            text-decoration: underline;
+            margin: 0 10px;
+            font-size: 0.95rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .flow-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .flow-box h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        .step-list {
+            list-style: none;
+            counter-reset: step;
+        }
+        .step-list li {
+            counter-increment: step;
+            padding: 10px 0 10px 50px;
+            position: relative;
+            border-bottom: 1px solid #f0f0f5;
+        }
+        .step-list li:last-child { border-bottom: none; }
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        h2.section-title {
+            font-size: 1.5rem;
+            margin: 50px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            color: #1a1a2e;
+        }
+        h3 {
+            font-size: 1.15rem;
+            margin: 30px 0 12px;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8f7ff; }
+        pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 16px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 12px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        code {
+            background: #e8e6f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #5b4a9e;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+            font-size: 0.95rem;
+        }
+        .note strong { color: #856404; }
+        .diagram {
+            background: white;
+            border: 2px dashed #d0cfe5;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 16px 0;
+            font-family: monospace;
+            font-size: 0.95rem;
+            line-height: 2;
+        }
+        .folder-tree {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            margin: 16px 0;
+        }
+        p { margin: 12px 0; }
+        ol { padding-left: 24px; margin: 12px 0; }
+        ol li { margin: 6px 0; }
+        .troubleshoot {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 12px 0;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+        }
+        .troubleshoot h4 {
+            color: #dc3545;
+            font-family: monospace;
+            margin-bottom: 6px;
+        }
+        .troubleshoot p { margin: 0; color: #555; }
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+            text-align: center;
+        }
+        .summary-box h2 { margin-bottom: 16px; }
+        .summary-box pre {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+        }
+        .summary-box p { margin-top: 16px; opacity: 0.9; }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+        footer a { color: #667eea; }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.4rem; }
+            .hero { padding: 40px 16px; }
+            .container { padding: 20px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>Antigravity + Claude Code<br>自立型エージェント セットアップガイド</h1>
+    <p>Mac環境で「Antigravity」と「Claude Code」を連携させ、自分だけの仮想カンパニー（AI組織）を構築するためのセットアップ手順です。</p>
+    <p>最終ゴールは、Claude Code上で秘書・マーケティング・開発・営業など<strong>仮想の組織を作り、AIに業務を任せられる環境</strong>を完成させることです。</p>
+    <div class="links">
+        <a href="https://youtu.be/cfoE_8Llde0">参考動画</a>
+        <a href="https://github.com/Shin-sibainu/cc-company">参考リポジトリ</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="flow-box">
+        <h2>全体の流れ</h2>
+        <ol class="step-list">
+            <li>開発環境の準備（Homebrew → Node.js）</li>
+            <li>Claude Codeのインストール・ログイン</li>
+            <li>Antigravityのセットアップ・日本語化</li>
+            <li>Claude Code拡張機能のインストール</li>
+            <li>AIの振る舞い設定（CLAUDE.md）</li>
+            <li>仮想カンパニーの構築（cc-company プラグイン）</li>
+            <li>運用開始</li>
+        </ol>
+    </div>
+
+    <!-- Section 1 -->
+    <h2 class="section-title">1. 前提条件と必要なツール</h2>
+
+    <table>
+        <tr><th>ツール</th><th>役割</th></tr>
+        <tr><td>Homebrew</td><td>Macの開発ツール管理（アプリストアのコマンド版）</td></tr>
+        <tr><td>Node.js / npm</td><td>Claude Codeの実行環境</td></tr>
+        <tr><td>Claude Code</td><td>Anthropic提供のCLIベースAIエージェント</td></tr>
+        <tr><td>Antigravity</td><td>AIエージェント統合型の次世代IDE（エディタ）</td></tr>
+        <tr><td>cc-company</td><td>Claude Code用の仮想組織構築プラグイン</td></tr>
+    </table>
+
+    <div class="diagram">
+        Homebrew → Node.jsをインストール<br>
+        Node.js → npmが付いてくる<br>
+        npm → Claude Codeをインストール<br>
+        Claude Code → cc-companyプラグインで仮想カンパニーを構築
+    </div>
+
+    <!-- Section 2 -->
+    <h2 class="section-title">2. インストール手順</h2>
+
+    <h3>2.1 Homebrewのインストール</h3>
+    <p>ターミナルで以下を実行：</p>
+    <pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+
+    <p>インストール完了後、<strong>パスを通す</strong>（これを忘れると <code>command not found</code> になる）：</p>
+    <pre><code>echo >> ~/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv zsh)"</code></pre>
+
+    <p>確認：</p>
+    <pre><code>brew --version</code></pre>
+    <p>→ バージョンが表示されればOK</p>
+
+    <h3>2.2 Node.jsのインストール</h3>
+    <pre><code>brew install node</code></pre>
+    <p>確認：</p>
+    <pre><code>node -v
+npm -v</code></pre>
+    <p>→ 両方バージョンが表示されればOK（Node.js v18以上が必要）</p>
+
+    <h3>2.3 Claude Codeのインストール</h3>
+    <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+    <p>確認：</p>
+    <pre><code>claude --version</code></pre>
+
+    <h3>2.4 Claude Codeの初期設定とログイン</h3>
+    <p>プロジェクトフォルダを作成して移動：</p>
+    <pre><code>mkdir ~/Desktop/MyCompany
+cd ~/Desktop/MyCompany</code></pre>
+
+    <p>Claude Codeを起動：</p>
+    <pre><code>claude</code></pre>
+
+    <p>起動後の手順：</p>
+    <ol>
+        <li>Enterキーを押してログイン方法を選択（APIキー認証 または Claude.ai認証）</li>
+        <li>ターミナル設定で <strong>「1. Yes, use recommended settings」</strong> を選択</li>
+        <li>フォルダ信頼確認で <strong>「1. Yes, I trust this folder」</strong> を選択してEnter</li>
+    </ol>
+
+    <h3>2.5 プロジェクトの初期化</h3>
+    <p>Claude Codeのプロンプト（>）で以下を実行：</p>
+    <pre><code>/init</code></pre>
+    <p>これによりAIがプロジェクト構造を読み込み、指示書となる <code>CLAUDE.md</code> が自動生成されます。</p>
+
+    <!-- Section 3 -->
+    <h2 class="section-title">3. Antigravityとの連携</h2>
+
+    <h3>3.1 Antigravityのセットアップ</h3>
+    <ol>
+        <li>Antigravityアプリを起動</li>
+        <li>初期セットアップで <strong>「Agent-driven development」</strong> を選択してNext</li>
+        <li>エディタ設定はデフォルトのまま進める</li>
+    </ol>
+
+    <h3>3.2 日本語化（オプション）</h3>
+    <ol>
+        <li><code>Cmd + Shift + P</code> でコマンドパレットを開く</li>
+        <li><code>display</code> と入力し <strong>「Configure Display Language」</strong> を選択</li>
+        <li><strong>「日本語 (ja)」</strong> を選択</li>
+        <li>日本語パックがない場合は自動インストール後、再起動</li>
+    </ol>
+
+    <h3>3.3 Claude Code拡張機能のインストール</h3>
+    <ol>
+        <li>Antigravityで対象プロジェクトフォルダを開く</li>
+        <li>左サイドバーの <strong>「拡張機能」</strong> アイコンをクリック</li>
+        <li>検索窓に <strong>「Claude Code」</strong> と入力</li>
+        <li><strong>Anthropic公式拡張機能</strong> をインストール</li>
+        <li><strong>「Spark（✦）」アイコン</strong> をクリック → Claude Codeチャット画面が表示される</li>
+    </ol>
+
+    <!-- Section 4 -->
+    <h2 class="section-title">4. AIの振る舞い設定（CLAUDE.mdのカスタマイズ）</h2>
+
+    <p>プロジェクトルートの <code>CLAUDE.md</code> を開き、末尾に以下を追記します。<br>
+    <strong>これはAIの「性格」と「行動ルール」を定義する最も重要な設定です。</strong></p>
+
+    <pre><code>## Agent Behavior &amp; Communication Rules
+
+- **Language:** ALWAYS communicate with the user in **Japanese (日本語)**.
+  All responses, explanations, and questions must be in Japanese.
+
+- **User Profile:** The user's name is **[あなたの名前]**, and works as a
+  **[あなたの職種]**.
+
+- **Communication Style:** Act as a frank, essential advisor. Do not just
+  agree or flatter. Thoroughly verify ideas, question assumptions, and point
+  out blind spots. If logic is weak, explain why clearly. Provide concrete,
+  prioritized suggestions for the next steps. Be honest and direct.</code></pre>
+
+    <div class="note">
+        <strong>ポイント：</strong> <code>[あなたの名前]</code> と <code>[あなたの職種]</code> を自分の情報に書き換えてください。
+    </div>
+
+    <!-- Section 5 -->
+    <h2 class="section-title">5. 仮想カンパニーの構築（cc-company プラグイン）</h2>
+
+    <p>ここが本ガイドのゴールです。Claude Code上に<strong>自分だけの仮想組織</strong>を作ります。</p>
+
+    <h3>5.1 cc-companyとは？</h3>
+    <p>Claude Code用のプラグインで、AIが「秘書」として窓口になり、TODO管理・壁打ち・メモなどを担当します。仕事が増えてきたら、マーケティング部・開発部・営業部など<strong>部署が自然に追加されていく</strong>仕組みです。</p>
+
+    <div class="diagram">
+        あなた → 秘書（窓口） → 各部署（必要に応じて追加）
+    </div>
+
+    <p>用意されている部署テンプレート：</p>
+    <table>
+        <tr><th>部署</th></tr>
+        <tr><td>秘書室（常設）</td></tr>
+        <tr><td>PM（プロジェクト管理）</td></tr>
+        <tr><td>リサーチ</td></tr>
+        <tr><td>マーケティング</td></tr>
+        <tr><td>開発</td></tr>
+        <tr><td>経理</td></tr>
+        <tr><td>営業</td></tr>
+        <tr><td>クリエイティブ</td></tr>
+        <tr><td>人事</td></tr>
+    </table>
+
+    <h3>5.2 GitHubのSSH設定（初回のみ）</h3>
+    <p>cc-companyプラグインのインストールにはGitHub接続が必要です。</p>
+
+    <p><strong>SSHキーを作成：</strong></p>
+    <pre><code>ssh-keygen -t ed25519 -C "your-email@example.com"</code></pre>
+    <p>→ 全部Enterを押せばOK</p>
+
+    <p><strong>SSHキーをコピー：</strong></p>
+    <pre><code>pbcopy &lt; ~/.ssh/id_ed25519.pub</code></pre>
+
+    <p><strong>GitHubに登録：</strong></p>
+    <ol>
+        <li>GitHub（https://github.com）にログイン</li>
+        <li>右上のアイコン → <strong>Settings</strong></li>
+        <li>左メニュー → <strong>SSH and GPG keys</strong></li>
+        <li><strong>New SSH key</strong> をクリック</li>
+        <li>Title: 任意（例: <code>My Mac</code>）</li>
+        <li>Key: <code>Cmd + V</code> で貼り付け</li>
+        <li><strong>Add SSH key</strong> をクリック</li>
+    </ol>
+
+    <p><strong>接続確認：</strong></p>
+    <pre><code>ssh -T git@github.com</code></pre>
+    <p>→ <code>Hi ○○! You've successfully authenticated</code> と出ればOK</p>
+
+    <h3>5.3 cc-companyプラグインのインストール</h3>
+    <p>Antigravity内のClaude Codeチャット欄、またはターミナルのClaude Codeで以下を実行：</p>
+    <pre><code>/plugin marketplace add Shin-sibainu/cc-company
+/plugin install company@cc-company</code></pre>
+
+    <h3>5.4 仮想カンパニーの初期セットアップ</h3>
+    <pre><code>/company</code></pre>
+
+    <p>秘書との対話が始まります：</p>
+    <pre><code>秘書: はじめまして！あなたの秘書になります。
+      まず、あなたの事業や活動を教えてください。
+
+あなた: （例）マーケティング担当です。業務効率化とデータ分析をやっています
+
+秘書: ありがとうございます！
+      今の目標や、日々困っていることがあれば教えてください。
+
+あなた: （例）タスクが散らかるのが悩み。施策の優先順位をつけたい</code></pre>
+
+    <p>セットアップ完了後、以下のフォルダが自動生成されます：</p>
+
+    <div class="folder-tree">
+.company/<br>
+├── CLAUDE.md &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← 組織ルール（AIが参照する設定ファイル）<br>
+└── secretary/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── CLAUDE.md &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← 秘書の振る舞い定義<br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── inbox/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← クイックメモ・とりあえずここに<br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── todos/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← 日次タスク管理<br>
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── 2026-04-01.md &nbsp;&nbsp;← 今日のTODO<br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── notes/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← 壁打ち・相談メモ・意思決定ログ
+    </div>
+
+    <h3>5.5 部署の追加</h3>
+    <p>最初は秘書室だけでスタート。仕事が増えたら、秘書が部署の追加を提案します。</p>
+
+    <p><strong>自動提案の場合：</strong></p>
+    <pre><code>秘書: リサーチの依頼が増えていますね。
+      リサーチ部門を作りましょうか？
+
+あなた: 作って
+→ .company/research/ が自動生成される</code></pre>
+
+    <p><strong>手動で追加する場合：</strong></p>
+    <pre><code>> マーケティング部を作って
+→ .company/marketing/ が自動生成される</code></pre>
+
+    <!-- Section 6 -->
+    <h2 class="section-title">6. 運用方法と使い分け</h2>
+
+    <h3>6.1 日常の使い方</h3>
+    <p>セットアップ完了後は、 <code>/company</code> で秘書に話しかけるだけです：</p>
+
+    <table>
+        <tr><th>やりたいこと</th><th>話しかけ方（例）</th></tr>
+        <tr><td>タスク追加</td><td>「今日のTODOに○○を追加して」</td></tr>
+        <tr><td>壁打ち・相談</td><td>「この施策について壁打ちしたい」</td></tr>
+        <tr><td>メモを残す</td><td>「さっきの会議で○○が決まった」</td></tr>
+        <tr><td>進捗確認</td><td>「ダッシュボード見せて」</td></tr>
+        <tr><td>リサーチ依頼</td><td>「○○について調べて」</td></tr>
+        <tr><td>ファイル編集</td><td>「○○のスクリプトを修正して」</td></tr>
+    </table>
+
+    <h3>6.2 ツール使い分けガイドライン</h3>
+    <table>
+        <tr><th>ツール</th><th>用途</th></tr>
+        <tr><td>Claude デスクトップアプリ / Web版</td><td>アイデア出し、文章作成、戦略の相談など（実行環境を伴わない思考整理）</td></tr>
+        <tr><td>Antigravity内のClaude Code</td><td>ファイル編集、スクリプト実行、WordPress投稿など（自立型エージェントとして実作業を任せる）</td></tr>
+        <tr><td><code>/company</code>（仮想カンパニー）</td><td>TODO管理、壁打ち、部署横断の業務管理（日々の業務の司令塔）</td></tr>
+    </table>
+
+    <h3>6.3 ダッシュボード</h3>
+    <p>「ダッシュボード」と話しかけると、組織の状況を一覧表示：</p>
+    <pre><code>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Company ダッシュボード
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+秘書室:
+  TODO（今日）: 3件 未完了 / 2件 完了
+  Inbox: 1件 未整理
+
+マーケティング:
+  コンテンツ企画: 2件 進行中
+
+何かありますか？
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</code></pre>
+
+    <!-- Section 7 -->
+    <h2 class="section-title">7. トラブルシューティング</h2>
+
+    <div class="troubleshoot">
+        <h4>command not found: brew</h4>
+        <p>→ パスが通っていない。2.1の「パスを通す」コマンドを再実行</p>
+    </div>
+    <div class="troubleshoot">
+        <h4>command not found: node</h4>
+        <p>→ Homebrewのパスを通した後、<code>brew install node</code> を再実行</p>
+    </div>
+    <div class="troubleshoot">
+        <h4>Host key verification failed</h4>
+        <p>→ 5.2のSSH設定を実施してから再実行</p>
+    </div>
+    <div class="troubleshoot">
+        <h4>/company が反応しない</h4>
+        <p>→ プラグインが正しくインストールされているか確認： <code>/plugin list</code></p>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-box">
+        <h2>まとめ</h2>
+        <pre>Homebrew → Node.js → Claude Code → Antigravity連携 → cc-company → 仮想カンパニー完成！</pre>
+        <p>最初は秘書だけの小さな組織からスタートし、使いながら自然に組織が育っていきます。<br>
+        「/company」で秘書に話しかけることから、すべてが始まります。</p>
+    </div>
+
+    <footer>
+        <p>参考資料：
+            <a href="https://github.com/Shin-sibainu/cc-company">cc-company リポジトリ</a> |
+            <a href="https://youtu.be/cfoE_8Llde0">解説動画</a>
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>
