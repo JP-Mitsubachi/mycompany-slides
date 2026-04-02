@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X（Twitter）運用マニュアル｜インバウンドテクノロジー株式会社</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --x-black: #000000;
+      --x-dark: #0f1419;
+      --x-blue: #1d9bf0;
+      --x-blue-dark: #0d84d4;
+      --green: #1e8c45;
+      --orange: #d4651a;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --border: #e5e8ed;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    /* ━━━ HEADER ━━━ */
+    header {
+      background: var(--x-dark);
+      color: white;
+      padding: 72px 24px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 25% 60%, rgba(29,155,240,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 30%, rgba(29,155,240,0.12) 0%, transparent 55%);
+    }
+    header > * { position: relative; }
+    .header-badge {
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 100px;
+      padding: 5px 18px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    header p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.6);
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .x-logo {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: white;
+      display: block;
+      margin-bottom: 16px;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* ━━━ NAV ━━━ */
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .nav-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      overflow-x: auto;
+      gap: 4px;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 16px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    nav a:hover { color: var(--x-blue); border-bottom-color: var(--x-blue); }
+
+    /* ━━━ LAYOUT ━━━ */
+    main { max-width: 900px; margin: 0 auto; padding: 40px 24px 100px; }
+
+    /* ━━━ INTRO CARD ━━━ */
+    .intro-card {
+      background: linear-gradient(135deg, #1d9bf0 0%, #0f1419 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin-bottom: 32px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+    }
+    .intro-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .intro-card p  { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.8; }
+    .intro-icon { font-size: 64px; opacity: 0.85; line-height: 1; }
+    @media (max-width: 560px) {
+      .intro-card { grid-template-columns: 1fr; }
+      .intro-icon { display: none; }
+    }
+
+    /* ━━━ TIMELINE CARD（メインフロー） ━━━ */
+    .timeline-card {
+      background: var(--x-dark);
+      color: white;
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin-bottom: 24px;
+    }
+    .timeline-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 24px; }
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0 20px;
+      padding-bottom: 24px;
+      position: relative;
+    }
+    .tl-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 39px;
+      top: 40px;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.12);
+    }
+    .tl-time {
+      text-align: center;
+      padding-top: 8px;
+    }
+    .tl-time .time-badge {
+      display: inline-block;
+      background: var(--x-blue);
+      color: white;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      width: 72px;
+    }
+    .tl-time .time-badge.auto { background: #166534; }
+    .tl-body { padding-top: 8px; }
+    .tl-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .tl-body p  { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.7; }
+    .tl-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .tl-badge.manual { background: rgba(29,155,240,0.25); color: #7dd3fc; }
+    .tl-badge.auto   { background: rgba(22,101,52,0.4);   color: #86efac; }
+
+    /* ━━━ SECTION ━━━ */
+    .section {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 36px 40px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) { .section { padding: 28px 24px; } }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .bg-blue   { background: #dbeafe; }
+    .bg-green  { background: #dcfce7; }
+    .bg-orange { background: #ffedd5; }
+    .bg-purple { background: #ede9fe; }
+    .bg-red    { background: #fee2e2; }
+    .bg-x      { background: #000; }
+
+    .section-title-text h2  { font-size: 19px; font-weight: 700; margin-bottom: 2px; }
+    .section-title-text p   { font-size: 13px; color: var(--muted); }
+
+    /* ━━━ STEPS ━━━ */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 0 20px;
+      padding-bottom: 28px;
+      position: relative;
+    }
+    .step:not(:last-child) .step-line {
+      position: absolute;
+      left: 19px; top: 40px; bottom: 0;
+      width: 2px; background: var(--border);
+    }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--x-dark); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0; position: relative; z-index: 1;
+    }
+    .step-num.blue { background: var(--x-blue); }
+    .step-content { padding-top: 8px; }
+    .step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step-content p  { font-size: 14px; color: #4b5563; }
+
+    /* ━━━ CODE ━━━ */
+    .code-box {
+      background: #0f1419;
+      color: #7dd3fc;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 14px;
+      margin: 10px 0;
+      word-break: break-all;
+    }
+    .code-box .cm { color: #6b7280; }
+    .code-box .kw { color: #86efac; }
+
+    /* ━━━ CALLOUT ━━━ */
+    .callout {
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 12px 0;
+      font-size: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .callout-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+    .callout.info    { background: #eff6ff; color: #1e40af; }
+    .callout.success { background: #f0fdf4; color: #166534; }
+    .callout.warning { background: #fffbeb; color: #92400e; }
+
+    /* ━━━ CHAT MOCK ━━━ */
+    .chat-mock {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 14px 0;
+    }
+    .chat-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+    .chat-row:last-child { margin-bottom: 0; }
+    .chat-row.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .avatar.shu   { background: var(--x-dark); color: white; }
+    .avatar.claude { background: var(--x-blue); color: white; font-size: 11px; font-weight: 700; }
+    .bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    .bubble.user   { background: var(--x-blue); color: white; border-top-right-radius: 4px; }
+    .bubble.claude { background: white; color: var(--text); border: 1px solid var(--border); border-top-left-radius: 4px; }
+
+    /* ━━━ FILE TREE ━━━ */
+    .file-tree {
+      background: #0f1419;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 20px 24px;
+      font-family: "SF Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.9;
+    }
+    .file-tree .dir  { color: #7dd3fc; }
+    .file-tree .file { color: #e2e8f0; }
+    .file-tree .note { color: #4b5563; }
+
+    /* ━━━ SCORE TABLE ━━━ */
+    .score-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    .score-table th {
+      background: #f4f6f9; padding: 10px 12px;
+      text-align: left; font-weight: 600; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .score-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .score-table tr:last-child td { border-bottom: none; }
+    .score-hi { color: #1e8c45; font-weight: 700; }
+    .score-lo { color: #dc2626; font-weight: 700; }
+
+    /* ━━━ FAQ ━━━ */
+    .faq + .faq { border-top: 1px solid var(--border); }
+    .faq-q {
+      padding: 18px 0;
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; gap: 16px; user-select: none;
+    }
+    .faq-q:hover { color: var(--x-blue); }
+    .chevron {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 11px; transition: transform 0.2s;
+    }
+    .chevron.open { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 0 18px; font-size: 14px; color: #4b5563; line-height: 1.8; }
+    .faq-a.open { display: block; }
+
+    /* ━━━ CTA ━━━ */
+    .cta-section {
+      background: var(--x-dark); color: white;
+      border-radius: 16px; padding: 48px 40px;
+      text-align: center; margin-bottom: 24px;
+    }
+    .cta-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+    .cta-section p  { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 28px; }
+    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 26px; border-radius: 10px;
+      font-size: 14px; font-weight: 700;
+      text-decoration: none; transition: all 0.15s;
+      border: none; cursor: pointer;
+    }
+    .btn-x    { background: white; color: var(--x-dark); }
+    .btn-x:hover { background: #e7e7e7; }
+    .btn-outline { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.4); }
+    .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+    /* ━━━ FOOTER ━━━ */
+    footer {
+      text-align: center; padding: 32px 24px;
+      color: #9ca3af; font-size: 12.5px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-badge">インバウンドテクノロジー株式会社</div>
+  <span class="x-logo">𝕏</span>
+  <h1>X（Twitter）運用マニュアル</h1>
+  <p>このマニュアルを見れば、誰でもX運用ができます</p>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#flow">📅 毎日の流れ</a>
+    <a href="#draft">✏️ ドラフトを作る</a>
+    <a href="#approve">✅ レビュー・承認</a>
+    <a href="#auto">🤖 自動投稿の仕組み</a>
+    <a href="#weekly">📊 週次レビュー</a>
+    <a href="#files">📁 ファイルの見方</a>
+    <a href="#faq">❓ よくある質問</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- INTRO -->
+  <div class="intro-card">
+    <div>
+      <h2>このマニュアルの使い方</h2>
+      <p>
+        X（Twitter）の投稿は <strong>Claude（AI）</strong> がドラフトを作ってくれます。<br>
+        あなたがやることは「<strong>レビューして、OKを出すだけ</strong>」。<br>
+        1日20分以内。承認したら、あとはAIが時間通りに投稿します。
+      </p>
+    </div>
+    <div class="intro-icon">🐦</div>
+  </div>
+
+  <!-- ===== 毎日の流れ ===== -->
+  <div class="timeline-card" id="flow">
+    <h2>📅 今日やること（毎日の流れ）</h2>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-time">
+          <div class="time-badge">朝<br>8:00</div>
+        </div>
+        <div class="tl-body">
+          <h3>Claudeにドラフトを作らせる <span class="tl-badge manual">自分でやる</span></h3>
+          <p>Claude Code（またはCowork）に「今日のドラフト作って」と言う。<br>
+             Claudeが3本のツイートを自動で考えて表示してくれます。</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-time">
+          <div class="time-badge">朝<br>8:10</div>
+        </div>
+        <div class="tl-body">
+          <h3>3本をレビューして承認する <span class="tl-badge manual">自分でやる</span></h3>
+          <p>3本のドラフトを読んで「OK」か「修正して」と答える。<br>
+             OKなら1本目がすぐX（Twitter）に投稿されます。</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-time">
+          <div class="time-badge auto">12:00<br>自動</div>
+        </div>
+        <div class="tl-body">
+          <h3>2本目が自動投稿される <span class="tl-badge auto">自動</span></h3>
+          <p>パソコンが時間を見て、自動で2本目をXに投稿します。<br>
+             あなたは何もしなくてOKです。</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-time">
+          <div class="time-badge auto">20:00<br>自動</div>
+        </div>
+        <div class="tl-body">
+          <h3>3本目が自動投稿される <span class="tl-badge auto">自動</span></h3>
+          <p>夜8時に3本目がXに投稿されます。<br>
+             今日の投稿は以上です。お疲れさまでした！</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== ドラフトを作る ===== -->
+  <div class="section" id="draft">
+    <div class="section-title">
+      <div class="section-icon bg-blue">✏️</div>
+      <div class="section-title-text">
+        <h2>ドラフトを作る</h2>
+        <p>Claudeにツイート案を3本生成させる方法</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Claudeを開く</h3>
+          <p>以下のどちらかで開けます：</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+              <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">🖥️ Claude Code（ターミナル）</div>
+              <div style="font-size: 12px; color: var(--muted);">フォルダを開いて使う。<br>1本目の即時投稿もここから。</div>
+            </div>
+            <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+              <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">💻 Cowork（デスクトップアプリ）</div>
+              <div style="font-size: 12px; color: var(--muted);">アプリから操作できる。<br>ドラフト生成・レビューに使う。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>「今日のドラフト作って」と伝える</h3>
+          <div class="chat-mock">
+            <div class="chat-row user">
+              <div class="avatar shu">し</div>
+              <div class="bubble user">今日のドラフト作って</div>
+            </div>
+            <div class="chat-row">
+              <div class="avatar claude">AI</div>
+              <div class="bubble claude">
+                📝 今日のドラフト3本です！<br><br>
+                <strong>【1本目 — インバウンド系】</strong><br>
+                訪日外国人が増えているのに、部屋を貸せない大家が増えている。...<br><br>
+                <strong>【2本目 — インバウンド系】</strong><br>
+                外国人入居の審査で落とす理由、9割は「怖いから」だ。...<br><br>
+                <strong>【3本目 — 経営・組織系】</strong><br>
+                採用で一番難しいのは、いい人を見つけることじゃない。...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>3本が表示されたら完了</h3>
+          <p>次のステップ「レビュー・承認」に進みましょう。</p>
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <span>ドラフトは自動で <code>x-bot/drafts/YYYY-MM-DD-draft.md</code> に保存されます。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== レビュー・承認 ===== -->
+  <div class="section" id="approve">
+    <div class="section-title">
+      <div class="section-icon bg-green">✅</div>
+      <div class="section-title-text">
+        <h2>レビュー・承認する</h2>
+        <p>ドラフトを確認して「OK」を出す方法</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>3本を読んで判断する</h3>
+          <p>それぞれ「OK」か「修正」かを判断します。</p>
+          <div style="margin-top: 12px; display: grid; gap: 10px;">
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px;">
+              <div style="font-size: 13px; font-weight: 700; color: #166534; margin-bottom: 4px;">✅ そのままOKの場合</div>
+              <div class="code-box" style="margin: 0; background: #0f1419;">全部OK</div>
+            </div>
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px;">
+              <div style="font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 4px;">✏️ 修正したい場合</div>
+              <div class="code-box" style="margin: 0; background: #0f1419;">2本目を「外国人採用で〇〇」という切り口に変えて</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num blue">2</div>
+        <div class="step-content">
+          <h3>「全部OK」と言ったら何が起きるか</h3>
+          <div class="chat-mock">
+            <div class="chat-row user">
+              <div class="avatar shu">し</div>
+              <div class="bubble user">全部OK</div>
+            </div>
+            <div class="chat-row">
+              <div class="avatar claude">AI</div>
+              <div class="bubble claude">
+                ✅ <strong>1本目を投稿しました！</strong><br>
+                🔗 x.com/h_shunosuke/status/...<br><br>
+                📥 2本目・3本目はキューに保存しました。<br>
+                ⏰ 2本目：12:00 に自動投稿<br>
+                ⏰ 3本目：20:00 に自動投稿
+              </div>
+            </div>
+          </div>
+          <div class="callout success" style="margin-top: 12px;">
+            <span class="callout-icon">🎉</span>
+            <div>
+              <strong>1本目が即座にXに投稿されます。</strong><br>
+              2・3本目はパソコンが自動で時間通りに投稿します。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>あとは何もしなくてOK</h3>
+          <p>12:00と20:00に自動投稿されます。スマホのX通知で確認できます。</p>
+          <div class="callout warning">
+            <span class="callout-icon">⚠️</span>
+            <span><strong>Cowork（デスクトップアプリ）</strong>から操作した場合、1本目の即時投稿はできません。キューに保存後、Claude Code から「1本目を投稿して」と言ってください。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 自動投稿の仕組み ===== -->
+  <div class="section" id="auto">
+    <div class="section-title">
+      <div class="section-icon bg-x">🤖</div>
+      <div class="section-title-text">
+        <h2>自動投稿の仕組み</h2>
+        <p>12:00・20:00に自動で投稿されるしくみ</p>
+      </div>
+    </div>
+
+    <p style="font-size: 14px; color: #4b5563; margin-bottom: 20px;">
+      むずかしい話は読まなくていいですが、「なんで自動で投稿されるの？」が気になる方向けに説明します。
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>承認後、キューファイルに保存される</h3>
+          <p>「OK」を出すと、2本目・3本目のツイートが以下のファイルに保存されます：</p>
+          <div class="code-box">x-bot/data/queue.json</div>
+          <div class="callout info">
+            <span class="callout-icon">📦</span>
+            <span>「キュー」は「待ち行列」のこと。投稿待ちのツイートが入る箱です。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>macOSのタイマーが起動する</h3>
+          <p>パソコンには「LaunchAgent（ランチエージェント）」という時計係がいます。毎日12:00と20:00になると自動で起動します。</p>
+          <div style="background: #f4f6f9; border-radius: 10px; padding: 16px; margin-top: 12px; font-size: 13px; color: #555;">
+            🕐 → 12:00になった！<br>
+            🤖 → queue.jsonを開く<br>
+            📤 → 2本目をXのAPIで投稿<br>
+            📝 → post-log.mdに記録<br>
+            🗑️ → キューから削除
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>ログで結果を確認できる</h3>
+          <p>投稿した結果は以下のファイルに記録されます：</p>
+          <div class="code-box">x-bot/logs/scheduled.log</div>
+          <div class="callout success">
+            <span class="callout-icon">✅</span>
+            <span>投稿が成功すると「<strong>✅ 投稿成功 → https://x.com/h_shunosuke/status/...</strong>」と記録されます。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 週次レビュー ===== -->
+  <div class="section" id="weekly">
+    <div class="section-title">
+      <div class="section-icon bg-orange">📊</div>
+      <div class="section-title-text">
+        <h2>週次レビュー（月曜日にやること）</h2>
+        <p>1週間の成果を確認して次週に活かす</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>「週次レビューやって」と伝える</h3>
+          <div class="code-box">週次レビューやって</div>
+          <p>先週の投稿ログを分析して、まとめてくれます。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Claudeが分析してくれる内容</h3>
+          <p>Growth Analyst（成長分析担当）が以下をチェックします：</p>
+          <div style="margin-top: 12px;">
+            <table class="score-table">
+              <thead>
+                <tr>
+                  <th>チェック項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>📈 エンゲージメント</td>
+                  <td>いいね・リツイート・引用RTの数</td>
+                </tr>
+                <tr>
+                  <td>🔥 バズり投稿</td>
+                  <td>一番反応が良かったツイートのテーマ</td>
+                </tr>
+                <tr>
+                  <td>📉 反応が少なかった投稿</td>
+                  <td>来週は避けるべきテーマ</td>
+                </tr>
+                <tr>
+                  <td>💬 リプ交流</td>
+                  <td>返信すべきアカウントのリスト</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>結果は weekly-review.md に保存される</h3>
+          <div class="code-box">.company/marketing/X運用/team/data/weekly-review.md</div>
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <span>月曜日の朝にこれをやっておくと、その週のドラフト精度が上がります。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ファイルの見方 ===== -->
+  <div class="section" id="files">
+    <div class="section-title">
+      <div class="section-icon bg-purple">📁</div>
+      <div class="section-title-text">
+        <h2>ファイルの見方</h2>
+        <p>どこに何があるかを把握しておこう</p>
+      </div>
+    </div>
+
+    <div class="file-tree">
+      <span class="dir">x-bot/</span><br>
+      <span class="file">├── drafts/ </span><span class="note">← 毎日のドラフト（YYYY-MM-DD-draft.md）</span><br>
+      <span class="file">├── data/</span><br>
+      <span class="file">│   ├── queue.json </span><span class="note">← 投稿待ちツイート（承認後に保存される）</span><br>
+      <span class="file">│   └── used_articles.json </span><span class="note">← 使用済み記事（重複防止）</span><br>
+      <span class="file">├── logs/</span><br>
+      <span class="file">│   ├── post.log </span><span class="note">← 1本目の投稿ログ</span><br>
+      <span class="file">│   └── scheduled.log </span><span class="note">← 2・3本目の投稿ログ</span><br>
+      <span class="file">├── post.py </span><span class="note">← 即時投稿スクリプト（触らなくてOK）</span><br>
+      <span class="file">└── queue_post.py </span><span class="note">← キュー投稿スクリプト（触らなくてOK）</span><br>
+      <br>
+      <span class="dir">.company/marketing/X運用/team/data/</span><br>
+      <span class="file">├── post-log.md </span><span class="note">← 全投稿の記録（分析の元データ）</span><br>
+      <span class="file">├── weekly-review.md </span><span class="note">← 週次PDCA</span><br>
+      <span class="file">└── scout-list.md </span><span class="note">← 交流アカウントリスト</span>
+    </div>
+
+    <div class="callout warning" style="margin-top: 16px;">
+      <span class="callout-icon">⚠️</span>
+      <span><strong>py ファイルや json ファイルは直接編集しないでください。</strong> Claudeが自動で管理します。</span>
+    </div>
+  </div>
+
+  <!-- ===== よくある質問 ===== -->
+  <div class="section" id="faq">
+    <div class="section-title">
+      <div class="section-icon bg-red">❓</div>
+      <div class="section-title-text">
+        <h2>よくある質問</h2>
+        <p>困ったときはここを見てください</p>
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        12:00になっても投稿されない
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        ① パソコンがスリープ中だと動きません。12:00前にスリープを解除しておいてください。<br><br>
+        ② <code>x-bot/data/queue.json</code> を開いて、今日の日付のデータが入っているか確認してください。空の場合は承認が完了していません。<br><br>
+        ③ それでもダメなら Claude Code で「12時の投稿を手動で実行して」と伝えてください。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ドラフトが気に入らない場合はどうする？
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        「2本目を〇〇というテーマに変えて」と言えば書き直してくれます。何度でも修正OKです。<br><br>
+        また、<code>.company/marketing/X運用/strategy.md</code> の「テーマ」や「トーン」を書き換えると、次回からの方向性が変わります。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Coworkから操作するときと Claude Code から操作するときの違いは？
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        <strong>Cowork（デスクトップアプリ）：</strong> ドラフト生成・修正・承認・queue保存まで可能。ただし1本目の即時投稿はできません。<br><br>
+        <strong>Claude Code（ターミナル）：</strong> すべての操作が可能。承認後に1本目をその場でXに投稿できます。<br><br>
+        朝の操作はできればClaude Codeで行うのがおすすめです。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        投稿したツイートを確認する方法は？
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        ① X（Twitter）のプロフィールページ @h_shunosuke を開く。<br>
+        ② または <code>x-bot/logs/post.log</code> や <code>x-bot/logs/scheduled.log</code> を開くと、投稿されたURLが記録されています。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        今日の投稿をキャンセルしたい
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        Claude Code に「今日の2本目・3本目の投稿をキャンセルして」と伝えてください。queue.json からエントリを削除します。<br><br>
+        すでに投稿済みの場合はXから手動で削除してください。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        週次レビューはいつやるの？
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        月曜日の朝がおすすめです。先週のデータをもとに今週のドラフト方針を最適化できます。<br>
+        必須ではありませんが、続けると投稿の精度が上がります。
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2>困ったらしゅうさんに聞いてください</h2>
+    <p>X運用は継続が命。毎日3本、レビューだけで終わらせましょう。<br>わからないことは止まる前に聞くのが一番早いです。</p>
+    <div class="btn-group">
+      <a href="https://x.com/h_shunosuke" target="_blank" class="btn btn-x">𝕏 @h_shunosuke を開く</a>
+      <span class="btn btn-outline" onclick="document.getElementById('draft').scrollIntoView({behavior:'smooth'})">✏️ ドラフトを作る</span>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  インバウンドテクノロジー株式会社 X運用マニュアル ／ 管理者：林秀乃佑
+</footer>
+
+<script>
+  function toggleFaq(el) {
+    const answer = el.nextElementSibling;
+    const chevron = el.querySelector('.chevron');
+    const isOpen = answer.classList.contains('open');
+    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.chevron').forEach(c => c.classList.remove('open'));
+    if (!isOpen) {
+      answer.classList.add('open');
+      chevron.classList.add('open');
+    }
+  }
+</script>
+</body>
+</html>
