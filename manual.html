@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEO運用マニュアル｜インバウンドテクノロジー株式会社</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0d1b2a;
+      --blue: #1b4f8a;
+      --accent: #2e80e3;
+      --green: #1e8c45;
+      --orange: #d4651a;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --border: #e5e8ed;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    /* ━━━ HEADER ━━━ */
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 72px 24px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(46,128,227,0.2) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 30%, rgba(27,79,138,0.3) 0%, transparent 60%);
+    }
+    header > * { position: relative; }
+    .header-badge {
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 100px;
+      padding: 5px 18px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    header p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.6);
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ━━━ NAV ━━━ */
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .nav-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      overflow-x: auto;
+      gap: 4px;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 16px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    nav a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ━━━ LAYOUT ━━━ */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+    }
+
+    /* ━━━ INTRO CARD ━━━ */
+    .intro-card {
+      background: linear-gradient(135deg, #1b4f8a 0%, #0d1b2a 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin-bottom: 32px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+    }
+    .intro-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .intro-card p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.8; }
+    .intro-icon {
+      font-size: 64px;
+      opacity: 0.85;
+      line-height: 1;
+    }
+    @media (max-width: 560px) {
+      .intro-card { grid-template-columns: 1fr; }
+      .intro-icon { display: none; }
+    }
+
+    /* ━━━ SECTION ━━━ */
+    .section {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 36px 40px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) {
+      .section { padding: 28px 24px; }
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .bg-blue   { background: #dbeafe; }
+    .bg-green  { background: #dcfce7; }
+    .bg-orange { background: #ffedd5; }
+    .bg-purple { background: #ede9fe; }
+    .bg-red    { background: #fee2e2; }
+
+    .section-title-text h2 {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .section-title-text p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ━━━ STEPS ━━━ */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 0 20px;
+      padding-bottom: 28px;
+      position: relative;
+    }
+    .step:not(:last-child) .step-line {
+      position: absolute;
+      left: 19px;
+      top: 40px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .step-content { padding-top: 8px; }
+    .step-content h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .step-content p {
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    /* ━━━ CODE ━━━ */
+    .code-box {
+      background: #0d1b2a;
+      color: #7dd3fc;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 14px;
+      margin: 10px 0;
+      word-break: break-all;
+      letter-spacing: 0.02em;
+    }
+
+    /* ━━━ CALLOUT ━━━ */
+    .callout {
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 12px 0;
+      font-size: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .callout-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+    .callout.info    { background: #eff6ff; color: #1e40af; }
+    .callout.success { background: #f0fdf4; color: #166534; }
+    .callout.warning { background: #fffbeb; color: #92400e; }
+
+    /* ━━━ SCREEN MOCK ━━━ */
+    .screen {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 14px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .screen-bar {
+      background: #f1f3f5;
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .screen-body { padding: 20px; font-size: 13.5px; color: #555; }
+
+    /* ━━━ CREDENTIAL BOX ━━━ */
+    .cred-box {
+      background: #fffbeb;
+      border: 1.5px solid #fcd34d;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 14px 0;
+    }
+    .cred-label-top {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #92400e;
+      margin-bottom: 16px;
+    }
+    .cred-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .cred-key {
+      font-size: 12px;
+      color: #6b7280;
+      width: 90px;
+      flex-shrink: 0;
+    }
+    .cred-val {
+      flex: 1;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-family: monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .copy-btn {
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover { background: var(--blue); }
+    .copy-btn.done  { background: var(--green); }
+
+    /* ━━━ RANK TABLE ━━━ */
+    .rank-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .rank-table th {
+      background: #f4f6f9;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .rank-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .rank-table tr:last-child td { border-bottom: none; }
+    .up   { color: #16a34a; font-weight: 700; }
+    .down { color: #dc2626; font-weight: 700; }
+
+    /* ━━━ FAQ ━━━ */
+    .faq + .faq { border-top: 1px solid var(--border); }
+    .faq-q {
+      padding: 18px 0;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      user-select: none;
+    }
+    .faq-q:hover { color: var(--accent); }
+    .chevron {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px;
+      transition: transform 0.2s;
+    }
+    .chevron.open { transform: rotate(180deg); }
+    .faq-a {
+      display: none;
+      padding: 0 0 18px;
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.8;
+    }
+    .faq-a.open { display: block; }
+
+    /* ━━━ CTA ━━━ */
+    .cta-section {
+      background: var(--navy);
+      color: white;
+      border-radius: 16px;
+      padding: 48px 40px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .cta-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+    .cta-section p  { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 28px; }
+    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-white  { background: white; color: var(--navy); }
+    .btn-white:hover { background: #f0f2f5; }
+    .btn-outline { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.4); }
+    .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+    /* ━━━ FOOTER ━━━ */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: #9ca3af;
+      font-size: 12.5px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-badge">インバウンドテクノロジー株式会社</div>
+  <h1>SEO運用マニュアル</h1>
+  <p>このマニュアルを見れば、誰でもSEO業務ができます</p>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#post">📝 記事を投稿する</a>
+    <a href="#ranking">📈 順位を確認する</a>
+    <a href="#rewrite">✏️ 記事を修正する</a>
+    <a href="#report">📋 レポートを見る</a>
+    <a href="#faq">❓ よくある質問</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- INTRO -->
+  <div class="intro-card">
+    <div>
+      <h2>このマニュアルの使い方</h2>
+      <p>
+        当社のSEO業務は <strong>Claude（AI）</strong> が自動でやってくれます。<br>
+        あなたがやることは「<strong>Claudeにお願いするだけ</strong>」です。<br>
+        むずかしいことは何もありません。一緒にやってみましょう！
+      </p>
+    </div>
+    <div class="intro-icon">🤖</div>
+  </div>
+
+  <!-- ===== 記事を投稿する ===== -->
+  <div class="section" id="post">
+    <div class="section-title">
+      <div class="section-icon bg-blue">📝</div>
+      <div class="section-title-text">
+        <h2>記事を投稿する</h2>
+        <p>新しいSEO記事をサイトに公開する方法</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Claude Code を開く</h3>
+          <p>パソコンで <strong>Claude Code（ターミナルの中にあるAI）</strong> を起動します。</p>
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <span>Claude Code は黒い画面（ターミナル）の中で動きます。わからない場合はしゅうさんに聞いてください。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>SEOフォルダを開く</h3>
+          <p>Claude Code で以下のフォルダを開きます：</p>
+          <div class="code-box">~/Desktop/shu-company/IBT-SEO-Team</div>
+          <div class="callout info">
+            <span class="callout-icon">💡</span>
+            <span>ターミナルに <code>cd ~/Desktop/shu-company/IBT-SEO-Team</code> と入力してEnterを押す</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Claudeに「投稿して」と伝える</h3>
+          <p>Claude に向かって、次のように話しかけます：</p>
+          <div class="code-box">記事を投稿して</div>
+          <p style="margin-top: 8px;">または</p>
+          <div class="code-box">今日の記事を投稿して</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>完了を待つ（約5〜10分）</h3>
+          <p>Claudeが自動で記事を書いて、サイトに公開してくれます。</p>
+          <div class="callout success" style="margin-top: 12px;">
+            <span class="callout-icon">✅</span>
+            <div>
+              こんな表示が出たら成功です：<br><br>
+              <strong>✅ 投稿完了 (post_id=○○○)</strong><br>
+              <strong>🔗 https://ib-tec.co.jp/career-advice/○○○/</strong><br><br>
+              URLをクリックして記事を確認しましょう！
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 順位を確認する ===== -->
+  <div class="section" id="ranking">
+    <div class="section-title">
+      <div class="section-icon bg-green">📈</div>
+      <div class="section-title-text">
+        <h2>SEO順位を確認する</h2>
+        <p>Googleで何位に表示されているかを調べる方法</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>KeywordMapにアクセスする</h3>
+          <p>ブラウザで下記URLを開きます：</p>
+          <div class="screen">
+            <div class="screen-bar">
+              <div class="dot" style="background:#ff5f57"></div>
+              <div class="dot" style="background:#febc2e"></div>
+              <div class="dot" style="background:#28c840"></div>
+              <span style="margin-left: 10px; font-size: 12px; color: #888;">🔒 keywordmap.jp/login</span>
+            </div>
+            <div class="screen-body">
+              <strong>KeywordMap</strong> は、Googleの検索順位を一覧で見られるツールです。<br>
+              毎日自動で順位を計測してくれます。
+            </div>
+          </div>
+          <a href="https://keywordmap.jp/login" target="_blank" class="btn btn-white" style="background: var(--accent); color: white; margin-top: 4px; text-decoration: none; display: inline-flex;">
+            🔗 KeywordMapを開く →
+          </a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>ログインする</h3>
+          <p>以下のID・パスワードを入力してログインします：</p>
+          <div class="cred-box">
+            <div class="cred-label-top">🔑 ログイン情報</div>
+            <div class="cred-row">
+              <div class="cred-key">ログインID</div>
+              <div class="cred-val" id="cred-id">otokake0715</div>
+              <button class="copy-btn" onclick="copyText('cred-id', this)">コピー</button>
+            </div>
+            <div class="cred-row">
+              <div class="cred-key">パスワード</div>
+              <div class="cred-val" id="cred-pw">Otokake0715!</div>
+              <button class="copy-btn" onclick="copyText('cred-pw', this)">コピー</button>
+            </div>
+          </div>
+          <div class="callout warning">
+            <span class="callout-icon">⚠️</span>
+            <span>このID・パスワードは社外秘です。社外の人に教えないでください。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>順位を確認する</h3>
+          <p>ログインすると、キーワードごとの検索順位が一覧で表示されます。</p>
+          <div class="screen" style="margin-top: 12px;">
+            <div class="screen-bar">
+              <div class="dot" style="background:#ff5f57"></div>
+              <div class="dot" style="background:#febc2e"></div>
+              <div class="dot" style="background:#28c840"></div>
+            </div>
+            <div class="screen-body">
+              <table class="rank-table">
+                <thead>
+                  <tr>
+                    <th>キーワード</th>
+                    <th>今週</th>
+                    <th>先週</th>
+                    <th>変化</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>転職 エージェント おすすめ</td>
+                    <td><strong>8位</strong></td>
+                    <td style="color:#9ca3af">12位</td>
+                    <td class="up">▲ 4</td>
+                  </tr>
+                  <tr>
+                    <td>30代 転職 平均年収</td>
+                    <td><strong>15位</strong></td>
+                    <td style="color:#9ca3af">13位</td>
+                    <td class="down">▼ 2</td>
+                  </tr>
+                  <tr>
+                    <td>退職理由 ポジティブ 言い換え</td>
+                    <td><strong>5位</strong></td>
+                    <td style="color:#9ca3af">5位</td>
+                    <td style="color:#9ca3af">— 0</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 10px; color: #9ca3af; font-size: 11px;">※ イメージです。実際の数値とは異なります</p>
+            </div>
+          </div>
+          <div class="callout info" style="margin-top: 12px;">
+            <span class="callout-icon">💡</span>
+            <span><strong>1位〜10位</strong> に入るとGoogleの1ページ目に表示されます。<strong>▲（上がった）</strong> は良いサイン、<strong>▼（下がった）</strong> はリライトのサインです。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 記事を修正する ===== -->
+  <div class="section" id="rewrite">
+    <div class="section-title">
+      <div class="section-icon bg-orange">✏️</div>
+      <div class="section-title-text">
+        <h2>記事を修正する（リライト）</h2>
+        <p>順位が落ちた記事を自動で改善する方法</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Claudeに「リライトして」と伝える</h3>
+          <div class="code-box">リライトして</div>
+          <p style="margin-top: 8px;">特定の記事を直したい場合：</p>
+          <div class="code-box">「転職 退職理由」の記事をリライトして</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>完了を待つ（約5〜10分）</h3>
+          <p>Claudeが記事を分析して、自動で改善してくれます。終わったら改善内容を教えてくれます。</p>
+          <div class="callout success" style="margin-top: 12px;">
+            <span class="callout-icon">✅</span>
+            <span>順位が落ちてきたと思ったら、すぐリライトを依頼しましょう。だいたい1〜2週間で効果が出ます。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== レポートを見る ===== -->
+  <div class="section" id="report">
+    <div class="section-title">
+      <div class="section-icon bg-purple">📋</div>
+      <div class="section-title-text">
+        <h2>レポートを見る</h2>
+        <p>SEOの成果をまとめたレポートを確認する方法</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-line"></div>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>週次レポートを見たいとき</h3>
+          <div class="code-box">週次レポート見せて</div>
+          <p>今週のアクセス数・順位変動・新規投稿数などがまとまります。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>月次戦略メモを作りたいとき</h3>
+          <div class="code-box">今月の戦略メモ作って</div>
+          <p>来月に向けたSEO戦略をAIが自動で考えてくれます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== よくある質問 ===== -->
+  <div class="section" id="faq">
+    <div class="section-title">
+      <div class="section-icon bg-red">❓</div>
+      <div class="section-title-text">
+        <h2>よくある質問</h2>
+        <p>困ったときはここを見てください</p>
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Claudeに話しかけても動かない
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        SEOフォルダ（IBT-SEO-Team）が正しく開けているか確認してください。フォルダが違う場所で開いていると、Claudeは動きません。しゅうさんに「SEOフォルダを開いて」と伝えてください。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        記事投稿が「エラー」で止まった
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        もう一度「記事を投稿して」と伝えてみてください。それでもダメな場合は、エラーメッセージをスクリーンショットしてしゅうさんに送ってください。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        KeywordMapにログインできない
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        パスワードは <strong>Otokake0715!</strong>（最後に「!」がついています）。コピー&ペーストで試してみてください。それでもダメな場合はしゅうさんに連絡してください。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        記事投稿は1日何本まで？
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        基本は <strong>1〜2本/日</strong> です。Google Sheetsに「投稿予定」として登録されているキーワードから順番に投稿されます。キーワードがなくなると投稿されません。
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        投稿した記事はどこで確認できる？
+        <div class="chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        投稿完了メッセージに <strong>URL（https://ib-tec.co.jp/...）</strong> が表示されます。そのURLをクリックすれば記事を確認できます。WordPress管理画面（ib-tec.co.jp/wp-admin）でも一覧で確認できます。
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2>困ったらしゅうさんに聞いてください</h2>
+    <p>SEOは長期戦です。毎日コツコツ投稿を続けることが一番大事。<br>わからないことはすぐ聞いて、止めないことを意識しましょう。</p>
+    <div class="btn-group">
+      <a href="https://keywordmap.jp/login" target="_blank" class="btn btn-white">📈 順位を確認する</a>
+      <a href="https://ib-tec.co.jp/wp-admin" target="_blank" class="btn btn-outline">📝 WordPress管理画面</a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  インバウンドテクノロジー株式会社 SEO運用マニュアル ／ 管理者：林秀乃佑
+</footer>
+
+<script>
+  function toggleFaq(el) {
+    const answer = el.nextElementSibling;
+    const chevron = el.querySelector('.chevron');
+    const isOpen = answer.classList.contains('open');
+    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.chevron').forEach(c => c.classList.remove('open'));
+    if (!isOpen) {
+      answer.classList.add('open');
+      chevron.classList.add('open');
+    }
+  }
+
+  function copyText(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ コピーした';
+      btn.classList.add('done');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('done'); }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
