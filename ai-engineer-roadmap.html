@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineer Roadmap — Prompt to Compound Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080d;--s1:#0f0f18;--s2:#161620;--bd:#222232;
+  --a:#5eead4;--b:#818cf8;--c:#f472b6;--w:#fbbf24;--v:#a78bfa;--o:#fb923c;
+  --tx:#d8dced;--mu:#5a5a72;
+  --nav-h:52px;--max:1080px;--px:clamp(18px,5vw,56px);
+  --xs:0.68rem;--sm:0.78rem;--md:0.88rem;--lg:1rem;--xl:1.15rem;--2xl:1.5rem;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;font-weight:300;line-height:1.75;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(94,234,212,0.055) 1px,transparent 1px);background-size:38px 38px;pointer-events:none;z-index:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 var(--px);background:rgba(8,8,13,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:var(--sm);color:var(--a);letter-spacing:0.1em;white-space:nowrap}
+.nav-links{display:flex;gap:20px;list-style:none}
+.nav-links a{color:var(--mu);text-decoration:none;font-family:'DM Mono',monospace;font-size:var(--xs);letter-spacing:0.08em;transition:color 0.2s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:var(--a)}
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;padding:calc(var(--nav-h) + 64px) var(--px) 80px;overflow:hidden}
+.hero-glow{position:absolute;pointer-events:none;width:720px;height:720px;border-radius:50%;background:radial-gradient(circle,rgba(94,234,212,0.07) 0%,transparent 65%);top:50%;left:42%;transform:translate(-50%,-50%)}
+.hero-inner{max-width:var(--max);width:100%;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--a);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px;opacity:0;animation:fadeUp 0.5s ease forwards 0.1s}
+.hero-eyebrow em{display:block;width:22px;height:1px;background:var(--a);flex-shrink:0;font-style:normal}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.8rem,7vw,6rem);line-height:1.02;letter-spacing:-0.035em;margin-bottom:22px;opacity:0;animation:fadeUp 0.5s ease forwards 0.22s}
+.h1p{display:block;color:var(--tx)}
+.h1g{display:block;background:linear-gradient(110deg,var(--a) 0%,var(--b) 50%,var(--v) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{max-width:460px;color:var(--mu);font-size:var(--md);line-height:1.9;margin-bottom:44px;opacity:0;animation:fadeUp 0.5s ease forwards 0.34s}
+.hero-stats{display:flex;gap:40px;flex-wrap:wrap;opacity:0;animation:fadeUp 0.5s ease forwards 0.46s}
+.stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:2.2rem;line-height:1;color:var(--a);display:block}
+.stat-l{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--mu);letter-spacing:0.12em;display:block}
+.scroll-cue{position:absolute;bottom:28px;left:var(--px);display:flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--mu);letter-spacing:0.12em;opacity:0;animation:fadeUp 0.5s ease forwards 0.8s}
+.scroll-bar{width:28px;height:1px;background:var(--a);animation:pulse 2.2s ease-in-out infinite}
+main{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding:0 var(--px) 120px}
+.section{margin-bottom:96px}
+.sh{display:flex;align-items:baseline;gap:14px;margin-bottom:34px;padding-bottom:14px;border-bottom:1px solid var(--bd)}
+.sn{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--a);letter-spacing:0.14em;white-space:nowrap;flex-shrink:0}
+.st{font-family:'Syne',sans-serif;font-weight:700;font-size:var(--2xl);letter-spacing:-0.02em;line-height:1.2}
+.sl{color:var(--mu);font-size:var(--md);line-height:1.9;margin-bottom:26px;max-width:620px}
+.layer-stack{display:flex;flex-direction:column;gap:2px;margin-bottom:40px}
+.layer-card{background:var(--s1);border:1px solid var(--bd);display:grid;grid-template-columns:48px 1fr 80px;grid-template-rows:auto auto;column-gap:16px;padding:20px 22px;position:relative;overflow:hidden;transition:background 0.2s,border-color 0.2s}
+.layer-card:first-child{border-radius:10px 10px 0 0}
+.layer-card:last-child{border-radius:0 0 10px 10px}
+.layer-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--lc);transform:scaleY(0);transform-origin:center;transition:transform 0.25s ease}
+.layer-card:hover::before{transform:scaleY(1)}
+.layer-card:hover{background:var(--s2);border-color:var(--lc)}
+.layer-card.l1{--lc:var(--c)}
+.layer-card.l2{--lc:var(--b)}
+.layer-card.l3{--lc:var(--a)}
+.layer-card.l4{--lc:var(--w)}
+.layer-card.l5{--lc:var(--v)}
+.layer-card.l6{--lc:var(--o)}
+.l-icon{grid-column:1;grid-row:1/3;align-self:start;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--s2);border:1px solid var(--bd);border-radius:8px;font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.l-body{grid-column:2;grid-row:1}
+.l-name{font-family:'Syne',sans-serif;font-weight:700;font-size:var(--lg);color:var(--lc);margin-bottom:4px;line-height:1.3}
+.l-desc{color:var(--mu);font-size:var(--sm);line-height:1.65;padding-bottom:8px}
+.l-sub{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;gap:4px}
+.ltag{font-family:'DM Mono',monospace;font-size:var(--xs);padding:2px 7px;border-radius:4px;background:var(--s2);border:1px solid var(--bd);color:var(--mu);display:inline-flex;align-items:center;gap:4px}
+.ltag::before{content:'›';color:var(--lc);font-size:0.7rem}
+.l-badge{grid-column:3;grid-row:1/3;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:2px;padding-top:2px}
+.l-badge-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.9rem;line-height:1;color:var(--lc);opacity:0.12}
+.l-badge-t{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--lc);opacity:0.55;letter-spacing:0.1em}
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--bd);-webkit-overflow-scrolling:touch}
+.concept-table{width:100%;border-collapse:collapse;font-size:var(--sm);min-width:540px}
+.concept-table th{text-align:left;padding:10px 14px;background:var(--s2);border-bottom:1px solid var(--bd);font-family:'DM Mono',monospace;font-size:var(--xs);letter-spacing:0.1em;color:var(--mu);font-weight:400}
+.concept-table th:not(:last-child),.concept-table td:not(:last-child){border-right:1px solid var(--bd)}
+.concept-table tr:not(:last-child) td{border-bottom:1px solid var(--bd)}
+.concept-table td{padding:11px 14px;background:var(--s1);vertical-align:top;line-height:1.6}
+.concept-table tr:hover td{background:var(--s2)}
+.concept-table td:first-child{font-family:'DM Mono',monospace;color:var(--a);white-space:nowrap}
+.concept-table td:nth-child(3),.concept-table td:nth-child(4){color:var(--mu)}
+.roadmap{position:relative;padding-left:4px}
+.rm-line{position:absolute;left:26px;top:26px;bottom:26px;width:1px;background:linear-gradient(to bottom,var(--c) 0%,var(--b) 25%,var(--a) 45%,var(--w) 65%,var(--v) 85%,var(--o) 100%)}
+.phase{display:grid;grid-template-columns:52px 1fr;column-gap:18px;margin-bottom:34px;opacity:0;transform:translateX(-10px);transition:opacity 0.4s ease,transform 0.4s ease}
+.phase.visible{opacity:1;transform:translateX(0)}
+.p-dot{width:52px;height:52px;border-radius:50%;background:var(--bg);border:2px solid var(--pc);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:var(--sm);color:var(--pc);flex-shrink:0;position:relative;z-index:1;transition:background 0.2s}
+.phase:hover .p-dot{background:var(--s1)}
+.p-body{padding-top:6px}
+.p-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:5px}
+.p-title{font-family:'Syne',sans-serif;font-weight:700;font-size:var(--xl);letter-spacing:-0.01em}
+.p-badge{font-family:'DM Mono',monospace;font-size:var(--xs);padding:2px 9px;border-radius:100px;border:1px solid var(--pc);color:var(--pc);opacity:0.7;letter-spacing:0.05em;white-space:nowrap}
+.p-desc{color:var(--mu);font-size:var(--sm);line-height:1.8;margin-bottom:13px;max-width:580px}
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:7px}
+.task-card{background:var(--s1);border:1px solid var(--bd);border-radius:7px;padding:11px 13px 11px 28px;position:relative;transition:border-color 0.18s}
+.task-card:hover{border-color:var(--pc)}
+.task-card::before{content:'✓';position:absolute;left:10px;top:12px;color:var(--pc);font-size:var(--xs);font-weight:700}
+.task-card strong{display:block;font-weight:500;color:var(--tx);font-size:var(--sm);margin-bottom:2px;line-height:1.4}
+.task-card span{color:var(--mu);font-size:var(--xs);line-height:1.5;display:block}
+.code-wrap{background:var(--s1);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin:14px 0}
+.code-head{padding:8px 16px;background:var(--s2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.code-lbl{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--a);letter-spacing:0.08em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dots{display:flex;gap:5px;flex-shrink:0}
+.dot{width:8px;height:8px;border-radius:50%}
+pre{padding:16px 20px;overflow-x:auto;font-family:'DM Mono',monospace;font-size:var(--sm);line-height:1.85;color:#8898b4}
+.kw{color:var(--b)}.str{color:var(--a)}.cm{color:var(--mu);font-style:italic}.fn{color:var(--c)}.nm{color:var(--w)}
+.alert{background:rgba(251,191,36,0.045);border:1px solid rgba(251,191,36,0.18);border-radius:8px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start;margin:14px 0}
+.alert-ico{font-size:var(--lg);flex-shrink:0;line-height:1.5}
+.alert-txt{font-size:var(--sm);color:var(--mu);line-height:1.75}
+.alert-txt strong{color:var(--w)}
+.tier-lbl{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--mu);letter-spacing:0.1em;margin:22px 0 9px;display:flex;align-items:center;gap:10px}
+.tier-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:4px}
+.res-card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:15px 17px;display:flex;flex-direction:column;gap:4px;transition:border-color 0.2s,transform 0.2s}
+.res-card:hover{border-color:var(--b);transform:translateY(-2px)}
+.res-type{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--b);letter-spacing:0.12em}
+.res-name{font-family:'Syne',sans-serif;font-weight:700;font-size:var(--lg);line-height:1.25}
+.res-url{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--a);word-break:break-all;opacity:0.7}
+.res-desc{color:var(--mu);font-size:var(--sm);line-height:1.65}
+.res-tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.tag{display:inline-block;padding:2px 7px;border-radius:100px;font-family:'DM Mono',monospace;font-size:var(--xs);border:1px solid}
+.tg{background:rgba(94,234,212,0.07);color:var(--a);border-color:rgba(94,234,212,0.22)}
+.tp{background:rgba(129,140,248,0.07);color:var(--b);border-color:rgba(129,140,248,0.22)}
+.tr{background:rgba(244,114,182,0.07);color:var(--c);border-color:rgba(244,114,182,0.22)}
+.ty{background:rgba(251,191,36,0.07);color:var(--w);border-color:rgba(251,191,36,0.22)}
+.tv{background:rgba(167,139,250,0.07);color:var(--v);border-color:rgba(167,139,250,0.22)}
+.diag-box{background:var(--s1);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.diag-hd{padding:17px 22px 15px;border-bottom:1px solid var(--bd)}
+.diag-hd h3{font-family:'Syne',sans-serif;font-weight:700;font-size:var(--xl);margin-bottom:3px}
+.diag-hd p{color:var(--mu);font-size:var(--sm)}
+.diag-cols{display:grid;grid-template-columns:repeat(3,1fr)}
+.diag-col{padding:17px 19px;border-right:1px solid var(--bd)}
+.diag-col:last-child{border-right:none}
+.diag-col-hd{font-family:'DM Mono',monospace;font-size:var(--xs);letter-spacing:0.08em;text-transform:uppercase;line-height:1.4;margin-bottom:11px;padding-bottom:9px;border-bottom:1px solid var(--bd)}
+.diag-col:nth-child(1) .diag-col-hd{color:var(--c)}
+.diag-col:nth-child(2) .diag-col-hd{color:var(--b)}
+.diag-col:nth-child(3) .diag-col-hd{color:var(--a)}
+.diag-item{font-size:var(--sm);color:var(--mu);line-height:1.5;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.diag-item:last-child{border-bottom:none}
+.mindset-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mc{padding:20px 22px;border-radius:10px;border:1px solid}
+.mc.bad{background:rgba(244,114,182,0.04);border-color:rgba(244,114,182,0.18)}
+.mc.good{background:rgba(94,234,212,0.04);border-color:rgba(94,234,212,0.18)}
+.mc-lbl{font-family:'DM Mono',monospace;font-size:var(--xs);letter-spacing:0.14em;margin-bottom:13px;display:block}
+.bad .mc-lbl{color:var(--c)}.good .mc-lbl{color:var(--a)}
+.mc-items{display:flex;flex-direction:column;gap:6px}
+.mc-item{font-size:var(--sm);color:var(--mu);padding-left:16px;position:relative;line-height:1.5}
+.mc-item::before{position:absolute;left:0;top:1px;font-size:var(--xs)}
+.bad .mc-item::before{content:'×';color:var(--c)}
+.good .mc-item::before{content:'→';color:var(--a)}
+.divider{display:flex;align-items:center;gap:12px;margin:32px 0;color:var(--mu);font-family:'DM Mono',monospace;font-size:var(--xs);letter-spacing:0.1em}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+.compound-box{background:linear-gradient(135deg,rgba(167,139,250,0.04),rgba(94,234,212,0.04));border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:26px 28px;margin:18px 0}
+.compound-box h3{font-family:'Syne',sans-serif;font-weight:700;font-size:var(--xl);color:var(--v);margin-bottom:10px}
+.compound-box p{color:var(--mu);font-size:var(--sm);line-height:1.85;margin-bottom:14px}
+.compound-box p strong{color:var(--tx);font-weight:500}
+.compound-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px dashed rgba(167,139,250,0.2)}
+.flow-node{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--a);flex-shrink:0}
+.flow-arrow{color:var(--v);font-family:'DM Mono',monospace;font-size:var(--md);flex-shrink:0}
+footer{position:relative;z-index:1;border-top:1px solid var(--bd);padding:26px var(--px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px}
+.footer-logo{font-family:'Syne',sans-serif;font-weight:800;color:var(--a);font-size:var(--sm);letter-spacing:0.1em;text-align:center}
+.footer-note{font-family:'DM Mono',monospace;font-size:var(--xs);color:var(--mu);letter-spacing:0.06em}
+.footer-note:last-child{text-align:right}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3;transform:scaleX(1.5);transform-origin:left}}
+@media(max-width:900px){.nav-links{display:none}.l-badge{display:none}.mindset-pair{grid-template-columns:1fr}.diag-cols{grid-template-columns:1fr}.diag-col{border-right:none;border-bottom:1px solid var(--bd)}.diag-col:last-child{border-bottom:none}footer{grid-template-columns:1fr;text-align:center;gap:8px}.footer-note:last-child{text-align:center}}
+@media(max-width:580px){.layer-card{grid-template-columns:38px 1fr}.l-icon{width:34px;height:34px;font-size:0.95rem}.l-sub{grid-column:2;grid-row:3}.phase{grid-template-columns:44px 1fr;column-gap:14px}.p-dot{width:44px;height:44px;font-size:var(--xs)}.rm-line{left:22px}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">AI ENG ROADMAP</div>
+  <ul class="nav-links">
+    <li><a href="#concepts">層</a></li>
+    <li><a href="#compound">コンパウンド</a></li>
+    <li><a href="#roadmap">ロードマップ</a></li>
+    <li><a href="#practice">実践</a></li>
+    <li><a href="#resources">リソース</a></li>
+    <li><a href="#mindset">マインドセット</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><em></em>Prompt → Context → Harness → Agents → Compound Systems</div>
+    <h1><span class="h1p">AIを設計する</span><span class="h1g">システム思考へ</span></h1>
+    <p class="hero-desc">プロンプトは入口。コンテキストは中盤。<br>ハーネスから先、本当のAIエンジニアリングが始まる。<br>モデルを使う人から、システムを設計する人へ。</p>
+    <div class="hero-stats">
+      <div><span class="stat-n">6</span><span class="stat-l">CORE LAYERS</span></div>
+      <div><span class="stat-n">7</span><span class="stat-l">PHASES</span></div>
+      <div><span class="stat-n">∞</span><span class="stat-l">DEPTH</span></div>
+    </div>
+  </div>
+  <div class="scroll-cue"><div class="scroll-bar"></div>SCROLL TO EXPLORE</div>
+</section>
+
+<main>
+<section class="section" id="concepts">
+  <div class="sh"><span class="sn">01 —</span><h2 class="st">6つの層 — AI活用の進化階層</h2></div>
+  <p class="sl">AI活用には明確な抽象度の階層がある。多くの人はLayer 1〜2で止まる。Layer 3で上位5%。Layer 4〜5を設計できる人が次世代のAIエンジニアだ。</p>
+  <div class="layer-stack">
+    <div class="layer-card l1">
+      <div class="l-icon">✍️</div>
+      <div class="l-body"><div class="l-name">Layer 1 — プロンプトエンジニアリング</div><div class="l-desc">LLMへの入力文を最適化する。指示の書き方、few-shot例の設計、Chain-of-Thoughtの誘導。スコープは単一プロンプト。<strong style="color:var(--tx)">"どう書くか"</strong>の技術。</div></div>
+      <div class="l-badge"><span class="l-badge-n">L1</span><span class="l-badge-t">PROMPT</span></div>
+      <div class="l-sub"><span class="ltag">指示の構造化（XML）</span><span class="ltag">Few-shot examples</span><span class="ltag">Chain-of-Thought</span><span class="ltag">Role prompting</span><span class="ltag">Output format指定</span></div>
+    </div>
+    <div class="layer-card l2">
+      <div class="l-icon">🧠</div>
+      <div class="l-body"><div class="l-name">Layer 2 — コンテキストエンジニアリング</div><div class="l-desc">コンテキストウィンドウ全体を設計・管理する。system prompt、会話履歴、RAG結果、ツール出力をどの順でどれだけ詰めるかの設計。<strong style="color:var(--tx)">"何を渡すか"</strong>の技術。</div></div>
+      <div class="l-badge"><span class="l-badge-n">L2</span><span class="l-badge-t">CONTEXT</span></div>
+      <div class="l-sub"><span class="ltag">System prompt設計</span><span class="ltag">RAG（検索拡張生成）</span><span class="ltag">Memory管理</span><span class="ltag">Tool output統合</span><span class="ltag">情報の優先順位付け</span></div>
+    </div>
+    <div class="layer-card l3">
+      <div class="l-icon">⚙️</div>
+      <div class="l-body"><div class="l-name">Layer 3 — ハーネスエンジニアリング</div><div class="l-desc">LLMを実行・評価・制御するシステム基盤を構築する。エージェントループ、ツール呼び出し制御、エラーハンドリング、evals。<strong style="color:var(--tx)">"どう動かすか"</strong>の技術。Claude Code自体がこの層の代表例。</div></div>
+      <div class="l-badge"><span class="l-badge-n">L3</span><span class="l-badge-t">HARNESS</span></div>
+      <div class="l-sub"><span class="ltag">Agent loop設計</span><span class="ltag">Function calling</span><span class="ltag">Evals フレームワーク</span><span class="ltag">エラーハンドリング</span><span class="ltag">ロギング・モニタリング</span></div>
+    </div>
+    <div class="layer-card l4">
+      <div class="l-icon">🤖</div>
+      <div class="l-body"><div class="l-name">Layer 4 — エージェント・オーケストレーション</div><div class="l-desc">複数のLLMが役割分担し、互いに会話しながら自律的にタスクを完遂する。Planner／Generator／Evaluatorのような分業と、それらの協調制御。<strong style="color:var(--tx)">"誰にやらせるか"</strong>の技術。</div></div>
+      <div class="l-badge"><span class="l-badge-n">L4</span><span class="l-badge-t">AGENTS</span></div>
+      <div class="l-sub"><span class="ltag">Multi-agent設計</span><span class="ltag">PGEループ</span><span class="ltag">Supervisor / Worker</span><span class="ltag">Hand-off制御</span><span class="ltag">Agent mesh</span></div>
+    </div>
+    <div class="layer-card l5">
+      <div class="l-icon">🧬</div>
+      <div class="l-body"><div class="l-name">Layer 5 — コンパウンドAIシステム</div><div class="l-desc">Berkeley BAIRが提唱した概念。「1つのLLMを賢くする」から「<strong style="color:var(--tx)">複数のLLM＋検索＋ツール＋評価器＋人間</strong>を組み合わせた1つのシステム」へ。モデル性能ではなくシステム設計が勝敗を決める段階。</div></div>
+      <div class="l-badge"><span class="l-badge-n">L5</span><span class="l-badge-t">COMPOUND</span></div>
+      <div class="l-sub"><span class="ltag">モデル選択の最適化</span><span class="ltag">パイプライン設計</span><span class="ltag">DSPy</span><span class="ltag">Human-in-the-loop</span><span class="ltag">コスト×精度設計</span></div>
+    </div>
+    <div class="layer-card l6">
+      <div class="l-icon">♾️</div>
+      <div class="l-body"><div class="l-name">Layer 6 — 自律AI / Self-improving Systems</div><div class="l-desc">AIが自分のハーネスを自分で改変する段階。新しいスキルを自分で書き、自分のメモリを整理し、失敗から学習する。まだ研究段階だが2026年以降の主戦場。<strong style="color:var(--tx)">"AIが自己進化する"</strong>フェーズ。</div></div>
+      <div class="l-badge"><span class="l-badge-n">L6</span><span class="l-badge-t">AUTONOMOUS</span></div>
+      <div class="l-sub"><span class="ltag">Self-improving agents</span><span class="ltag">Meta-learning</span><span class="ltag">AI OS</span><span class="ltag">Voyager型学習</span><span class="ltag">Sakana AI系</span></div>
+    </div>
+  </div>
+  <div class="alert"><div class="alert-ico">⚡</div><div class="alert-txt"><strong>構造認識：</strong> プロンプトはコンテキストの一部。コンテキストはハーネスの一部。ハーネスはエージェントの一部。エージェントはコンパウンドシステムの一部。外側を知らずに内側だけ学んでも天井は低い。</div></div>
+  <div class="divider">CORE CONCEPTS</div>
+  <div class="table-wrap">
+    <table class="concept-table">
+      <thead><tr><th>概念</th><th>一言定義</th><th>判断基準</th><th>よくある誤解</th></tr></thead>
+      <tbody>
+        <tr><td>Tokens</td><td>LLMが処理する最小単位。文字≠トークン。</td><td>コストとコンテキスト長はここで決まる</td><td>文字数でカウントしようとする</td></tr>
+        <tr><td>Context Window</td><td>モデルが一度に"見える"範囲。</td><td>ここに何を入れるかがすべて</td><td>大きければ何でも入れていい</td></tr>
+        <tr><td>Temperature</td><td>出力のランダム性。0=決定論的、1=創造的。</td><td>タスクによって使い分ける</td><td>高いほど賢い</td></tr>
+        <tr><td>System Prompt</td><td>モデルの役割・制約・出力形式を定義する。</td><td>ここの設計でほぼ決まる</td><td>ユーザーメッセージより弱い</td></tr>
+        <tr><td>Function Calling</td><td>LLMが外部ツールを呼び出す仕組み。</td><td>エージェント化の基礎</td><td>LLMが直接実行していると思う</td></tr>
+        <tr><td>RAG</td><td>検索結果をコンテキストに注入して精度を上げる。</td><td>ファインチューニング不要で知識を拡張できる</td><td>ファインチューニングと同義と思う</td></tr>
+        <tr><td>Evals</td><td>LLMの出力品質を定量的に評価する仕組み。</td><td>"なんか良さそう"からの脱却</td><td>人間が毎回チェックすれば十分</td></tr>
+        <tr><td>Agentic Loop</td><td>LLMが自律的に行動→観察→次のアクションを繰り返す。</td><td>複数ステップのタスク自動化の基礎</td><td>単発の質問応答と同じ</td></tr>
+        <tr><td>Multi-agent</td><td>複数のLLMが役割分担して協調する仕組み。</td><td>単一エージェントの限界を超える</td><td>ただLLMを並べれば協調すると思う</td></tr>
+        <tr><td>Orchestration</td><td>複数エージェント・ツール・モデルの実行制御。</td><td>LangGraph/CrewAI/AutoGen の核心</td><td>単なる関数呼び出しの順序だと思う</td></tr>
+        <tr><td>Compound AI System</td><td>複数モデル＋検索＋ツール＋人間を組み合わせた統合システム。</td><td>モデルではなくシステム設計が差を生む</td><td>「でかいモデル1個でいい」と思う</td></tr>
+        <tr><td>DSPy</td><td>Stanford発。プロンプトを"プログラム"として書くフレームワーク。</td><td>プロンプトの手書き職人芸から脱却</td><td>LangChainの上位互換だと思う</td></tr>
+        <tr><td>Self-improving</td><td>エージェントが自分でスキル・記憶・戦略を更新する。</td><td>Voyager論文などの研究領域</td><td>ファインチューニングと同じだと思う</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="compound">
+  <div class="sh"><span class="sn">02 —</span><h2 class="st">コンパウンドAIシステム — 次の主戦場</h2></div>
+  <p class="sl">2024年にBerkeley BAIRが発表した論文「The Shift from Models to Compound AI Systems」が業界の常識を変えた。もうモデル性能競争の時代じゃない。</p>
+
+  <div class="compound-box">
+    <h3>なぜ「モデル1個」では勝てなくなったのか</h3>
+    <p>GPT-4もClaude Opusも、単体では限界がある。<strong>2024年の最先端システムはほぼすべて「複数のAIコンポーネントを組み合わせたもの」</strong>だった。AlphaCode、AlphaGeometry、Devin、Perplexity、Claude Code — 全部コンパウンドAIシステム。</p>
+    <p>核心は3つ。<strong>①同じモデルでもシステム設計で性能は数倍変わる ②コストと精度のトレードオフを細かく制御できる ③人間・ツール・評価器を組み込める</strong>。これが単一モデルでは絶対にできない芸当だ。</p>
+    <div class="compound-flow">
+      <div class="flow-node">User Query</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Router</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Retriever</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Planner (Opus)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Generator (Sonnet)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Evaluator (Haiku)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Human Review</div>
+    </div>
+  </div>
+
+  <div class="divider">COMPOUND DESIGN PRINCIPLES</div>
+  <div class="table-wrap">
+    <table class="concept-table">
+      <thead><tr><th>設計原則</th><th>内容</th><th>実例</th></tr></thead>
+      <tbody>
+        <tr><td>Model Routing</td><td>タスクの難易度に応じて呼ぶモデルを切り替える</td><td>簡単な分類はHaiku、戦略判断はOpus</td></tr>
+        <tr><td>Cascading</td><td>安いモデルで試し、自信がないときだけ高いモデルへ</td><td>FrugalGPT、Confidence-based fallback</td></tr>
+        <tr><td>Verification</td><td>生成結果を別モデルまたは決定論的スクリプトで検証</td><td>LLM-as-Judge、ルールチェッカー</td></tr>
+        <tr><td>Decomposition</td><td>大きなタスクを小タスクに分解して個別処理</td><td>Plan → Execute → Synthesize</td></tr>
+        <tr><td>Tool Augmentation</td><td>LLMの弱点（計算・検索・最新情報）をツールで補う</td><td>Code interpreter、Web search、DB query</td></tr>
+        <tr><td>Human-in-the-loop</td><td>重要判断で人間を組み込む</td><td>契約書レビュー、最終決裁</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert"><div class="alert-ico">🎯</div><div class="alert-txt"><strong>てるさんの現在地：</strong> <code style="color:var(--a)">pricing-loop</code>（Planner→Generator→Evaluator）はすでにコンパウンドAIシステムの入口。次は「各ステップでどのモデルを使い、どこに決定論的スクリプトを挟み、どこで人間レビューを入れるか」を設計できるようになること。</div></div>
+</section>
+
+<section class="section" id="roadmap">
+  <div class="sh"><span class="sn">03 —</span><h2 class="st">学習ロードマップ</h2></div>
+  <p class="sl">順序が命。各フェーズは「完璧になってから次へ」ではない。7割できたら進め。Phase 6〜7は現時点で実践している人が圧倒的に少ない領域。</p>
+  <div class="roadmap">
+    <div class="rm-line"></div>
+    <div class="phase" style="--pc:var(--c)">
+      <div class="p-dot">01</div>
+      <div class="p-body">
+        <div class="p-head"><span class="p-title">APIの基礎と構造理解</span><span class="p-badge">1〜2週間</span></div>
+        <p class="p-desc">「Claudeが動く仕組み」を知る。ブラックボックスをなくす最初のステップ。ここをスキップすると後でずっと詰まる。</p>
+        <div class="task-grid">
+          <div class="task-card" style="--pc:var(--c)"><strong>Anthropic APIを叩く</strong><span>Pythonで生のAPIレスポンスを見る。JSONの構造を把握する。</span></div>
+          <div class="task-card" style="--pc:var(--c)"><strong>レスポンスの全フィールドを読む</strong><span>content, usage, stop_reason — 全部意味を調べる。</span></div>
+          <div class="task-card" style="--pc:var(--c)"><strong>パラメータを一個ずつ変える</strong><span>temperature, max_tokens, system。変えると何が起きるか観察。</span></div>
+          <div class="task-card" style="--pc:var(--c)"><strong>エラーを意図的に起こす</strong><span>rate limit、token超過、invalid requestの感覚を掴む。</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phase" style="--pc:var(--b)">
+      <div class="p-dot">02</div>
+      <div class="p-body">
+        <div class="p-head"><span class="p-title">プロンプト設計の体系化</span><span class="p-badge">2〜3週間</span></div>
+        <p class="p-desc">「なんとなく書く」から「設計する」へ。公式ドキュメントを基礎にしつつ、自分のユースケースで繰り返し実験する。</p>
+        <div class="task-grid">
+          <div class="task-card" style="--pc:var(--b)"><strong>公式Prompt Libraryを全部読む</strong><span>docs.anthropic.com — なぜその構造なのかを考える。</span></div>
+          <div class="task-card" style="--pc:var(--b)"><strong>XML構造でプロンプトを書く</strong><span>&lt;task&gt;&lt;context&gt;&lt;output_format&gt; の使い分けを習得。</span></div>
+          <div class="task-card" style="--pc:var(--b)"><strong>Few-shotの設計</strong><span>例の質と数が出力品質に直結することを実験で確認。</span></div>
+          <div class="task-card" style="--pc:var(--b)"><strong>失敗プロンプトを解剖する</strong><span>「うまくいかなかった」プロンプトの原因を6層で分類。</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phase" style="--pc:var(--a)">
+      <div class="p-dot">03</div>
+      <div class="p-body">
+        <div class="p-head"><span class="p-title">コンテキスト設計</span><span class="p-badge">3〜4週間</span></div>
+        <p class="p-desc">何をコンテキストに入れるか、どの順で入れるか、何を切り捨てるか。情報の取捨選択こそが設計の本質。</p>
+        <div class="task-grid">
+          <div class="task-card"><strong>System promptの設計原則</strong><span>役割、制約、出力形式、例外処理を分けて書く。</span></div>
+          <div class="task-card"><strong>会話履歴の管理</strong><span>何件分の履歴を持つか。要約vs圧縮vs削除の判断。</span></div>
+          <div class="task-card"><strong>RAGの基礎を実装</strong><span>検索→コンテキスト注入→回答生成の流れを手で動かす。</span></div>
+          <div class="task-card"><strong>コンテキスト汚染を体験</strong><span>不要な情報を入れすぎて出力が劣化することを意図的に起こす。</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phase" style="--pc:var(--w)">
+      <div class="p-dot">04</div>
+      <div class="p-body">
+        <div class="p-head"><span class="p-title">ツール呼び出しとハーネス構築</span><span class="p-badge">4〜6週間</span></div>
+        <p class="p-desc">LLMを「考えるだけ」から「行動できる」存在にする。ここから別次元になる。Claude Code自体のアーキテクチャを理解するのもこの段階。</p>
+        <div class="task-grid">
+          <div class="task-card" style="--pc:var(--w)"><strong>Function callingを実装する</strong><span>tool_use でLLMが外部APIを呼び出す仕組みを手で理解。</span></div>
+          <div class="task-card" style="--pc:var(--w)"><strong>シンプルなエージェントを作る</strong><span>「検索→読む→要約」の3ステップエージェント。</span></div>
+          <div class="task-card" style="--pc:var(--w)"><strong>Anthropic "Building effective agents"を読む</strong><span>2024年12月公開の必読記事。パターン分類が秀逸。</span></div>
+          <div class="task-card" style="--pc:var(--w)"><strong>エラーループに対処する</strong><span>無限ループに入ったとき何が原因か診断できるようになる。</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phase" style="--pc:#a78bfa">
+      <div class="p-dot">05</div>
+      <div class="p-body">
+        <div class="p-head"><span class="p-title">Evals（評価）と品質管理</span><span class="p-badge">継続的</span></div>
+        <p class="p-desc">出力品質を定量的に測れる人間が本当のAIエンジニア。最後のフェーズではなく、常に並行する作業。</p>
+        <div class="task-grid">
+          <div class="task-card" style="--pc:#a78bfa"><strong>テストケースを作る習慣</strong><span>プロンプトを変えるたびに同じ入力で出力を比較する。</span></div>
+          <div class="task-card" style="--pc:#a78bfa"><strong>LLM-as-judgeを実装</strong><span>別のLLMに出力を採点させる手法。人間レビューのスケール化。</span></div>
+          <div class="task-card" style="--pc:#a78bfa"><strong>失敗事例を分類する</strong><span>L1〜L6 どのカテゴリの失敗が多いかを把握する。</span></div>
+          <div class="task-card" style="--pc:#a78bfa"><strong>Anthropic Evalsを動かす</strong><span>公式ドキュメントのevals章を読んで実際に動かす。</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phase" style="--pc:var(--v)">
+      <div class="p-dot">06</div>
+      <div class="p-body">
+        <div class="p-head"><span class="p-title">マルチエージェント・オーケストレーション</span><span class="p-badge">6〜8週間</span></div>
+        <p class="p-desc">複数のAIが協調するシステムを設計する。ここから「使う側」と「設計する側」が分かれる。てるさんの <code style="color:var(--a)">pricing-loop</code> はまさにこの段階。</p>
+        <div class="task-grid">
+          <div class="task-card" style="--pc:var(--v)"><strong>PGEループを自作する</strong><span>Planner→Generator→Evaluatorを手で書く。役割分担の勘所を掴む。</span></div>
+          <div class="task-card" style="--pc:var(--v)"><strong>LangGraphのチュートリアル</strong><span>状態機械としてエージェントを設計する感覚を養う。</span></div>
+          <div class="task-card" style="--pc:var(--v)"><strong>CrewAI / AutoGenを触る</strong><span>役割ベースのマルチエージェント設計を体験する。</span></div>
+          <div class="task-card" style="--pc:var(--v)"><strong>Claude Sub-agentsの活用</strong><span>Claude Code標準のサブエージェント機能を設計し分ける。</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phase" style="--pc:var(--o)">
+      <div class="p-dot">07</div>
+      <div class="p-body">
+        <div class="p-head"><span class="p-title">コンパウンドAIシステム設計</span><span class="p-badge">継続的</span></div>
+        <p class="p-desc">モデル選択・ルーティング・評価器・人間レビューを統合した本番システムを設計する。ここができる人間は国内でまだ数百人しかいない。</p>
+        <div class="task-grid">
+          <div class="task-card" style="--pc:var(--o)"><strong>BAIR論文を読む</strong><span>「The Shift from Models to Compound AI Systems」— 2024年の必読。</span></div>
+          <div class="task-card" style="--pc:var(--o)"><strong>DSPyを触る</strong><span>Stanford発。プロンプトを"プログラム"として書く新パラダイム。</span></div>
+          <div class="task-card" style="--pc:var(--o)"><strong>モデルルーティング実装</strong><span>Haiku/Sonnet/Opusをタスク難易度で切り替える。コスト×精度の感覚。</span></div>
+          <div class="task-card" style="--pc:var(--o)"><strong>Voyager論文を読む</strong><span>Self-improving agentsの代表例。将来のLv6を覗く。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="practice">
+  <div class="sh"><span class="sn">04 —</span><h2 class="st">APIレスポンスの読み方</h2></div>
+  <p class="sl">まず動かして、レスポンスを目で見る。これが最速の勉強法。</p>
+  <div class="code-wrap">
+    <div class="code-head"><span class="code-lbl">PYTHON — API基礎確認スクリプト</span><div class="dots"><div class="dot" style="background:var(--c)"></div><div class="dot" style="background:var(--w)"></div><div class="dot" style="background:var(--a)"></div></div></div>
+    <pre><span class="cm"># pip3 install anthropic</span>
+
+<span class="kw">import</span> anthropic, json
+
+client = anthropic.<span class="fn">Anthropic</span>(api_key=<span class="str">"YOUR_API_KEY"</span>)
+
+response = client.messages.<span class="fn">create</span>(
+    model=<span class="str">"claude-opus-4-6"</span>,
+    max_tokens=<span class="nm">1024</span>,
+    system=<span class="str">"あなたは簡潔に答えるアシスタントです。"</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"東京の人口は？"</span>}]
+)
+
+<span class="cm"># ここを必ず読む — 全フィールドを確認する</span>
+<span class="fn">print</span>(json.<span class="fn">dumps</span>(response.<span class="fn">model_dump</span>(), indent=<span class="nm">2</span>, ensure_ascii=<span class="kw">False</span>))</pre>
+  </div>
+  <p style="color:var(--mu);font-size:var(--sm);margin-bottom:12px">実行すると以下のJSONが返る。各フィールドの意味を全部理解することがStep 1のゴール：</p>
+  <div class="code-wrap">
+    <div class="code-head"><span class="code-lbl">JSON — APIレスポンス構造（注釈付き）</span><div class="dots"><div class="dot" style="background:var(--c)"></div><div class="dot" style="background:var(--w)"></div><div class="dot" style="background:var(--a)"></div></div></div>
+    <pre>{
+  <span class="str">"id"</span>: <span class="str">"msg_01XxXx..."</span>,          <span class="cm">// リクエストID（ログ・デバッグ用）</span>
+  <span class="str">"type"</span>: <span class="str">"message"</span>,
+  <span class="str">"role"</span>: <span class="str">"assistant"</span>,
+  <span class="str">"content"</span>: [                    <span class="cm">// 実際の出力。配列形式に注意</span>
+    { <span class="str">"type"</span>: <span class="str">"text"</span>, <span class="str">"text"</span>: <span class="str">"東京の人口は約1,400万人..."</span> }
+  ],
+  <span class="str">"model"</span>: <span class="str">"claude-opus-4-6"</span>,
+  <span class="str">"stop_reason"</span>: <span class="str">"end_turn"</span>,      <span class="cm">// ★ 必ずチェック（後述）</span>
+  <span class="str">"usage"</span>: {
+    <span class="str">"input_tokens"</span>: <span class="nm">42</span>,           <span class="cm">// コスト計算と最適化に使う</span>
+    <span class="str">"output_tokens"</span>: <span class="nm">87</span>          <span class="cm">// input + output = 課金対象</span>
+  }
+}</pre>
+  </div>
+  <div class="alert"><div class="alert-ico">💡</div><div class="alert-txt"><strong>stop_reasonを必ずチェックせよ。</strong> "max_tokens"で止まっていたら出力が切れている。"tool_use"なら次のアクションが必要。ここを無視するとバグの温床になる。</div></div>
+
+  <div class="divider">COMPOUND SYSTEM — MODEL ROUTING 実装例</div>
+  <div class="code-wrap">
+    <div class="code-head"><span class="code-lbl">PYTHON — コスト最適化のためのモデルルーティング</span><div class="dots"><div class="dot" style="background:var(--c)"></div><div class="dot" style="background:var(--w)"></div><div class="dot" style="background:var(--a)"></div></div></div>
+    <pre><span class="cm"># コンパウンドAIシステムの心臓部：タスクに応じてモデルを切り替える</span>
+
+<span class="kw">def</span> <span class="fn">route_task</span>(task_type: str, complexity: str) -> str:
+    <span class="cm"># 簡単な分類・抽出 → 最安モデル</span>
+    <span class="kw">if</span> task_type <span class="kw">in</span> [<span class="str">"classify"</span>, <span class="str">"extract"</span>]:
+        <span class="kw">return</span> <span class="str">"claude-haiku-4-5"</span>
+
+    <span class="cm"># 通常の生成・要約 → 中位モデル</span>
+    <span class="kw">if</span> complexity == <span class="str">"medium"</span>:
+        <span class="kw">return</span> <span class="str">"claude-sonnet-4-6"</span>
+
+    <span class="cm"># 戦略判断・複雑推論 → 最上位モデル</span>
+    <span class="kw">return</span> <span class="str">"claude-opus-4-6"</span>
+
+<span class="cm"># 使用例: PGEループ内で役割ごとに最適モデルを選ぶ</span>
+planner_model   = <span class="fn">route_task</span>(<span class="str">"strategy"</span>, <span class="str">"high"</span>)     <span class="cm"># Opus</span>
+generator_model = <span class="fn">route_task</span>(<span class="str">"generate"</span>, <span class="str">"medium"</span>)   <span class="cm"># Sonnet</span>
+evaluator_model = <span class="fn">route_task</span>(<span class="str">"classify"</span>, <span class="str">"low"</span>)     <span class="cm"># Haiku</span>
+
+<span class="cm"># → これだけでコストは1/10、精度はほぼ維持できる</span></pre>
+  </div>
+</section>
+
+<section class="section" id="resources">
+  <div class="sh"><span class="sn">05 —</span><h2 class="st">学習リソース（優先順位付き）</h2></div>
+  <div class="alert"><div class="alert-ico">⚠️</div><div class="alert-txt"><strong>これだけは覚えろ：</strong> リソースを集めることが勉強ではない。「読んだ→試した→失敗した→原因を特定した」——このサイクルを回した数が実力になる。</div></div>
+
+  <div class="tier-lbl">// TIER 1 — まず読むべき（一次ソース・公式）</div>
+  <div class="res-grid">
+    <div class="res-card"><div class="res-type">OFFICIAL DOCS</div><div class="res-name">Anthropic Docs</div><div class="res-url">docs.anthropic.com</div><div class="res-desc">プロンプトエンジニアリング、API仕様、evals。ここが全ての基準。他のブログより先に読む。</div><div class="res-tags"><span class="tag tg">最優先</span><span class="tag tp">随時更新</span></div></div>
+    <div class="res-card"><div class="res-type">MUST READ</div><div class="res-name">Building Effective Agents</div><div class="res-url">anthropic.com/research/building-effective-agents</div><div class="res-desc">Anthropic公式。2024年12月公開の必読記事。Workflow vs Agentの区別、5つの基本パターン（Prompt chaining, Routing, Parallelization, Orchestrator-workers, Evaluator-optimizer）を解説。</div><div class="res-tags"><span class="tag tg">L4必読</span><span class="tag tr">超重要</span></div></div>
+    <div class="res-card"><div class="res-type">OFFICIAL REPO</div><div class="res-name">Anthropic Cookbook</div><div class="res-url">github.com/anthropics/anthropic-cookbook</div><div class="res-desc">実際に動くコードサンプル集。RAG、エージェント、ツール使用の参照実装。</div><div class="res-tags"><span class="tag tg">実装参照</span><span class="tag ty">GitHub</span></div></div>
+    <div class="res-card"><div class="res-type">COURSE</div><div class="res-name">Anthropic Courses</div><div class="res-url">github.com/anthropics/courses</div><div class="res-desc">公式の無料コース。Prompt Engineering、Tool Use、RAGの3本が特に重要。</div><div class="res-tags"><span class="tag tg">無料</span><span class="tag tp">体系的</span></div></div>
+  </div>
+
+  <div class="tier-lbl">// TIER 2 — コンパウンドAIシステムを学ぶ（L5領域）</div>
+  <div class="res-grid">
+    <div class="res-card"><div class="res-type">LANDMARK PAPER</div><div class="res-name">BAIR: Shift to Compound AI Systems</div><div class="res-url">bair.berkeley.edu/blog/2024/02/18/compound-ai-systems/</div><div class="res-desc">Berkeley AI Researchの公式ブログ。「モデル中心からシステム中心へ」という業界の転換点を宣言した記事。これを読まずにL5は語れない。</div><div class="res-tags"><span class="tag tv">必読</span><span class="tag tr">概念理解</span></div></div>
+    <div class="res-card"><div class="res-type">FRAMEWORK</div><div class="res-name">DSPy (Stanford)</div><div class="res-url">github.com/stanfordnlp/dspy</div><div class="res-desc">プロンプトを「手書き」から「プログラム」へ。宣言的にLLMパイプラインを書き、自動最適化する革新的フレームワーク。次世代AI開発の標準候補。</div><div class="res-tags"><span class="tag tv">次世代</span><span class="tag tp">Stanford</span></div></div>
+    <div class="res-card"><div class="res-type">PAPER</div><div class="res-name">FrugalGPT</div><div class="res-url">arxiv.org/abs/2305.05176</div><div class="res-desc">LLM呼び出しコストを98%削減する論文。モデルカスケーディング、クエリルーティングの原典。コスト意識あるAIエンジニア必読。</div><div class="res-tags"><span class="tag ty">コスト最適化</span></div></div>
+    <div class="res-card"><div class="res-type">BLOG</div><div class="res-name">Lilian Weng Blog</div><div class="res-url">lilianweng.github.io</div><div class="res-desc">OpenAI出身の研究者による体系的な解説。「LLM Powered Autonomous Agents」は特に名著。L4〜L6の地図になる。</div><div class="res-tags"><span class="tag tr">深い</span><span class="tag tp">英語</span></div></div>
+  </div>
+
+  <div class="tier-lbl">// TIER 3 — オーケストレーションフレームワーク（L4実装）</div>
+  <div class="res-grid">
+    <div class="res-card"><div class="res-type">OSS</div><div class="res-name">LangGraph</div><div class="res-url">langchain-ai.github.io/langgraph/</div><div class="res-desc">LangChain製の状態機械ベースのエージェントフレームワーク。LangChainより設計がまとも。マルチエージェント構築の事実上の標準。</div><div class="res-tags"><span class="tag tp">推奨</span><span class="tag tg">L4実装</span></div></div>
+    <div class="res-card"><div class="res-type">OSS</div><div class="res-name">CrewAI</div><div class="res-url">github.com/crewAIInc/crewAI</div><div class="res-desc">役割ベース（Role-based）のマルチエージェントフレームワーク。「営業部長」「マーケター」など役割を与えて協調させる発想。直感的。</div><div class="res-tags"><span class="tag tp">直感的</span></div></div>
+    <div class="res-card"><div class="res-type">OSS</div><div class="res-name">Microsoft AutoGen</div><div class="res-url">github.com/microsoft/autogen</div><div class="res-desc">Microsoft製。エージェント同士の会話でタスクを進める設計。研究用途に強く、概念が学びやすい。</div><div class="res-tags"><span class="tag tp">研究向き</span></div></div>
+    <div class="res-card"><div class="res-type">OSS</div><div class="res-name">LangChain</div><div class="res-url">github.com/langchain-ai/langchain</div><div class="res-desc">使うより読むためのOSS。agent/chains の設計意図を理解する教材として優秀。本番で使うかは別問題。</div><div class="res-tags"><span class="tag tp">設計参照</span></div></div>
+  </div>
+
+  <div class="tier-lbl">// TIER 4 — Self-improving / 自律AI（L6の覗き見）</div>
+  <div class="res-grid">
+    <div class="res-card"><div class="res-type">PAPER</div><div class="res-name">Voyager</div><div class="res-url">voyager.minedojo.org</div><div class="res-desc">NVIDIA研究所。Minecraft内でGPT-4が自分でスキルを発見・記述・保存していく。Self-improving agentの金字塔。</div><div class="res-tags"><span class="tag tv">研究</span><span class="tag tr">必見</span></div></div>
+    <div class="res-card"><div class="res-type">RESEARCH</div><div class="res-name">Sakana AI</div><div class="res-url">sakana.ai</div><div class="res-desc">元Google Brainの研究者らが創業した日本発AI研究所。自己進化するAIエージェント、AIサイエンティスト等、Lv6領域の最前線。</div><div class="res-tags"><span class="tag tv">日本発</span><span class="tag ty">最前線</span></div></div>
+    <div class="res-card"><div class="res-type">PAPER</div><div class="res-name">AI Scientist</div><div class="res-url">sakana.ai/ai-scientist/</div><div class="res-desc">AIが自分で研究テーマを立て、実験し、論文を書く。Sakana AI発。自律AIの一歩先の姿。</div><div class="res-tags"><span class="tag tv">未来</span></div></div>
+    <div class="res-card"><div class="res-type">PAPER</div><div class="res-name">Reflexion</div><div class="res-url">arxiv.org/abs/2303.11366</div><div class="res-desc">エージェントが自分の失敗を言語で振り返り、次の試行を改善する仕組み。自己改善の基礎論文。</div><div class="res-tags"><span class="tag tv">基礎</span></div></div>
+  </div>
+
+  <div class="tier-lbl">// TIER 5 — 実践ツール</div>
+  <div class="res-grid">
+    <div class="res-card"><div class="res-type">TOOL</div><div class="res-name">Anthropic Workbench</div><div class="res-url">console.anthropic.com</div><div class="res-desc">プロンプトの実験場。パラメータをGUIで変えながら出力の変化を観察する。</div><div class="res-tags"><span class="tag tg">即実践</span></div></div>
+    <div class="res-card"><div class="res-type">TOOL</div><div class="res-name">Claude Code</div><div class="res-url">claude.com/claude-code</div><div class="res-desc">今てるさんが使っているCLI自体がL3ハーネス＋L4マルチエージェントの最高峰教材。Skills、Sub-agents、Hooksの設計思想を読み解け。</div><div class="res-tags"><span class="tag tg">教材</span><span class="tag ty">現在地</span></div></div>
+    <div class="res-card"><div class="res-type">TOOL</div><div class="res-name">LangSmith</div><div class="res-url">smith.langchain.com</div><div class="res-desc">エージェントのトレーシング・evaluationプラットフォーム。マルチステップ実行の可視化と評価。</div><div class="res-tags"><span class="tag tp">L5観測</span></div></div>
+    <div class="res-card"><div class="res-type">COMMUNITY</div><div class="res-name">Anthropic Discord</div><div class="res-url">discord.gg/anthropic</div><div class="res-desc">公式コミュニティ。エラーで詰まったときの質問と最新情報のキャッチアップ。</div><div class="res-tags"><span class="tag tp">コミュニティ</span></div></div>
+  </div>
+</section>
+
+<section class="section" id="diagnosis">
+  <div class="sh"><span class="sn">06 —</span><h2 class="st">問題の診断フレームワーク</h2></div>
+  <p class="sl">「うまくいかない」とき、原因がどの層にあるかを即座に特定できるか。これが「できてる」の本当の意味。</p>
+  <div class="diag-box">
+    <div class="diag-hd"><h3>症状 → 原因層 マッピング</h3><p>出力がおかしいとき、まずこの表で原因層を特定する</p></div>
+    <div class="diag-cols">
+      <div class="diag-col"><div class="diag-col-hd">L1 — プロンプト問題</div><div class="diag-item">指示通りに動かない</div><div class="diag-item">フォーマットがバラバラ</div><div class="diag-item">トーンが期待と違う</div><div class="diag-item">関係ない情報を出してくる</div><div class="diag-item">日本語で答えてほしいのに英語</div></div>
+      <div class="diag-col"><div class="diag-col-hd">L2 — コンテキスト問題</div><div class="diag-item">長い会話で前の情報を忘れる</div><div class="diag-item">外部データを参照できない</div><div class="diag-item">回答がふわっとして具体性がない</div><div class="diag-item">複数ターンで一貫性がない</div><div class="diag-item">関係ない情報に引きずられる</div></div>
+      <div class="diag-col"><div class="diag-col-hd">L3 — ハーネス問題</div><div class="diag-item">たまに動いてたまに落ちる</div><div class="diag-item">エージェントがループする</div><div class="diag-item">ツール呼び出しが失敗する</div><div class="diag-item">レスポンスが突然切れる</div><div class="diag-item">本番で再現できないバグ</div></div>
+    </div>
+    <div class="diag-cols" style="border-top:1px solid var(--bd)">
+      <div class="diag-col"><div class="diag-col-hd" style="color:var(--w) !important">L4 — エージェント問題</div><div class="diag-item">役割分担が曖昧で仕事が重複する</div><div class="diag-item">エージェント間で情報が伝わらない</div><div class="diag-item">Plannerの計画が実行不可能</div><div class="diag-item">Evaluatorが常にOKを出してしまう</div><div class="diag-item">ループ回数が多すぎてコスト爆発</div></div>
+      <div class="diag-col"><div class="diag-col-hd" style="color:var(--v) !important">L5 — コンパウンド問題</div><div class="diag-item">安いモデルに重要判断を任せている</div><div class="diag-item">高いモデルを無駄に使っている</div><div class="diag-item">検証ステップが抜けていて精度不安定</div><div class="diag-item">人間レビューの挿入位置が間違っている</div><div class="diag-item">システム全体のコストが読めない</div></div>
+      <div class="diag-col"><div class="diag-col-hd" style="color:var(--o) !important">L6 — 自律性問題</div><div class="diag-item">学習したスキルが再利用されない</div><div class="diag-item">メモリが肥大化して機能しない</div><div class="diag-item">失敗の振り返りが次に活きない</div><div class="diag-item">自己改変が暴走する</div><div class="diag-item">まだ研究領域なので実務では稀</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mindset">
+  <div class="sh"><span class="sn">07 —</span><h2 class="st">マインドセット</h2></div>
+  <p class="sl">伸びる人と止まる人の違いは、知識量ではなく行動パターンにある。</p>
+  <div class="mindset-pair">
+    <div class="mc bad">
+      <span class="mc-lbl">✗ 止まる人のパターン</span>
+      <div class="mc-items">
+        <div class="mc-item">体系的に学んでから実装しようとする</div>
+        <div class="mc-item">ツールの使い方を覚えることが目標になる</div>
+        <div class="mc-item">失敗の原因を「モデルの限界」にする</div>
+        <div class="mc-item">リソースを集めることが勉強だと思う</div>
+        <div class="mc-item">プロンプトを感覚で書いて感覚で評価する</div>
+        <div class="mc-item">一度動いたら振り返らずに次へ進む</div>
+        <div class="mc-item">英語ドキュメントを後回しにする</div>
+        <div class="mc-item">「大きいモデルを使えば解決する」と考える</div>
+      </div>
+    </div>
+    <div class="mc good">
+      <span class="mc-lbl">→ 伸びる人のパターン</span>
+      <div class="mc-items">
+        <div class="mc-item">7割で動かして残り3割を後で埋める</div>
+        <div class="mc-item">「なぜ動いたか」「なぜ動かなかったか」を言語化する</div>
+        <div class="mc-item">失敗を6層（L1〜L6）で分類する習慣がある</div>
+        <div class="mc-item">一次ソース（公式docs・原典論文）を最初に読む</div>
+        <div class="mc-item">同じ入力で出力を比較してプロンプトを改善する</div>
+        <div class="mc-item">自分のユースケースで実験することを優先する</div>
+        <div class="mc-item">OSSを使うだけでなく読んで設計を学ぶ</div>
+        <div class="mc-item">「どのモデルを、どう組み合わせるか」で考える</div>
+      </div>
+    </div>
+  </div>
+  <div class="alert" style="margin-top:14px"><div class="alert-ico">🎯</div><div class="alert-txt"><strong>本質：</strong> AI活用エンジニアに必要なのは「AIが何をできるか」を知ることではなく、「AIがなぜそう動いたか」を説明できること。そしてその先、「<strong>モデルを賢く使う人</strong>」から「<strong>システムとして設計する人</strong>」になった瞬間、あなたはユーザーからエンジニアへ、エンジニアからアーキテクトへと進化する。</div></div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-note">// Prompt → Context → Harness → Agents → Compound → Autonomous</div>
+  <div class="footer-logo">AI ENG ROADMAP v2</div>
+  <div class="footer-note">Built for Teru Company</div>
+</footer>
+
+<script>
+const phases = document.querySelectorAll('.phase');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const i = Array.from(phases).indexOf(e.target);
+      setTimeout(() => e.target.classList.add('visible'), i * 75);
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+phases.forEach(p => io.observe(p));
+
+const navAs = document.querySelectorAll('.nav-links a');
+const secs  = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 68) cur = s.id; });
+  navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+}, { passive: true });
+</script>
+</body>
+</html>
