@@ -3,780 +3,728 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>マイカンパニー スターターキット</title>
+<title>LPM Pricing Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-  :root {
-    --bg: #0f0f13;
-    --surface: #1a1a24;
-    --surface2: #22222f;
-    --border: #2e2e42;
-    --accent: #7c6cfc;
-    --accent2: #4fc9a4;
-    --accent3: #f5a623;
-    --text: #e8e8f0;
-    --muted: #8888a8;
-    --slide-w: 1100px;
-    --slide-h: 620px;
-  }
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f6f8fb;
+  --border: #e5e9f0;
+  --text: #0b1e3f;          /* 濃紺メイン */
+  --text-soft: #5a6b8c;
+  --accent: #1a3a7a;        /* 濃紺アクセント */
+  --accent-2: #2563eb;
+  --ok: #15803d;
+  --warn: #b45309;
+  --bad: #b91c1c;
+  --card-shadow: 0 1px 3px rgba(11,30,63,.06), 0 4px 16px rgba(11,30,63,.04);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Helvetica Neue', 'Hiragino Sans', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-    gap: 16px;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  background: var(--bg-soft);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
 
-  .deck {
-    position: relative;
-    width: var(--slide-w);
-    height: var(--slide-h);
-    overflow: hidden;
-  }
+header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-  .slide {
-    position: absolute;
-    inset: 0;
-    background: var(--surface);
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    padding: 52px 60px;
-    display: none;
-    flex-direction: column;
-    gap: 20px;
-    animation: fadeIn .25s ease;
-  }
-  .slide.active { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+header .title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-  /* NAV */
-  .nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--muted);
-    font-size: 13px;
-  }
-  .nav button {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 8px 20px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: background .15s;
-  }
-  .nav button:hover { background: var(--border); }
-  .nav button:disabled { opacity: .3; cursor: default; }
-  .slide-count { margin: 0 auto; }
+header .subtitle {
+  color: var(--text-soft);
+  font-size: 13px;
+  margin-top: 4px;
+}
 
-  /* COMMON */
-  .label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  h1 { font-size: 42px; font-weight: 800; line-height: 1.15; }
-  h2 { font-size: 28px; font-weight: 700; }
-  .sub { color: var(--muted); font-size: 15px; line-height: 1.7; }
-  .tag {
-    display: inline-block;
-    background: rgba(124,108,252,.15);
-    border: 1px solid rgba(124,108,252,.3);
-    border-radius: 6px;
-    padding: 3px 10px;
-    font-size: 12px;
-    color: var(--accent);
-  }
+header .badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.02em;
+}
 
-  /* SLIDE 1 — COVER */
-  .cover-kicker { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
-  .cover h1 { font-size: 52px; }
-  .cover-body { color: var(--muted); font-size: 17px; line-height: 1.8; max-width: 600px; }
-  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-  .pill {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 5px 14px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .cover-accent {
-    position: absolute;
-    right: 60px; top: 50%;
-    transform: translateY(-50%);
-    width: 280px; height: 280px;
-    border-radius: 50%;
-    background: radial-gradient(circle at center, rgba(124,108,252,.18) 0%, transparent 70%);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 80px;
-  }
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 32px 80px;
+}
 
-  /* SLIDE 2 — CONCEPT */
-  .concept-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    flex: 1;
-  }
-  .concept-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .concept-icon { font-size: 28px; }
-  .concept-title { font-size: 16px; font-weight: 700; }
-  .concept-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+section {
+  margin-bottom: 40px;
+}
 
-  /* SLIDE 3 — DEPARTMENTS */
-  .dept-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    flex: 1;
-  }
-  .dept-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .dept-card .icon { font-size: 24px; }
-  .dept-card .name { font-size: 14px; font-weight: 700; }
-  .dept-card .role { font-size: 11px; color: var(--muted); line-height: 1.5; }
-  .dept-card.accent { border-color: rgba(124,108,252,.4); }
+h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.02em;
+}
 
-  /* SLIDE 4 — SKILLS */
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    flex: 1;
-  }
-  .skill-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .skill-icon {
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .skill-icon.purple { background: rgba(124,108,252,.15); }
-  .skill-icon.green  { background: rgba(79,201,164,.15); }
-  .skill-icon.orange { background: rgba(245,166,35,.15); }
-  .skill-icon.pink   { background: rgba(252,108,160,.15); }
-  .skill-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
-  .skill-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 2px;
+}
 
-  /* SLIDE 5 — SETUP */
-  .steps {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    flex: 1;
-  }
-  .step {
-    display: flex;
-    align-items: flex-start;
-    gap: 18px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 20px;
-  }
-  .step-num {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 800;
-    font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .step-body { display: flex; flex-direction: column; gap: 4px; }
-  .step-title { font-size: 15px; font-weight: 700; }
-  .step-detail { font-size: 12px; color: var(--muted); }
-  .code {
-    display: inline-block;
-    background: rgba(124,108,252,.12);
-    border: 1px solid rgba(124,108,252,.2);
-    border-radius: 5px;
-    padding: 1px 7px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 12px;
-    color: #a89dff;
-  }
+/* ---------- KPI Cards ---------- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
 
-  /* SLIDE 6 — COMMANDS */
-  .cmd-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    flex: 1;
-  }
-  .cmd-group {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .cmd-group-title {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--accent2);
-    margin-bottom: 2px;
-  }
-  .cmd-row {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    font-size: 13px;
-  }
-  .cmd-row .cmd { font-family: monospace; color: #a89dff; white-space: nowrap; flex-shrink: 0; }
-  .cmd-row .desc { color: var(--muted); font-size: 12px; }
+.kpi {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: var(--card-shadow);
+}
 
-  /* SLIDE 7 — STRUCTURE */
-  .tree {
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 13px;
-    line-height: 2;
-    color: var(--muted);
-    flex: 1;
-    display: flex;
-    gap: 40px;
-  }
-  .tree-col { flex: 1; }
-  .tree .d { color: var(--accent); font-weight: 600; }
-  .tree .f { color: var(--text); }
-  .tree .cm { color: var(--muted); font-size: 11px; }
+.kpi .label {
+  font-size: 11px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
 
-  /* SLIDE 8 — MAINTENANCE */
-  .maint-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    flex: 1;
-  }
-  .maint-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .maint-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .maint-list { display: flex; flex-direction: column; gap: 6px; }
-  .maint-item {
-    font-size: 12px;
-    color: var(--muted);
-    padding-left: 14px;
-    position: relative;
-    line-height: 1.5;
-  }
-  .maint-item::before {
-    content: '›';
-    position: absolute; left: 0;
-    color: var(--accent);
-  }
+.kpi .value {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: var(--text);
+}
 
-  /* SLIDE 9 — PIXEL OFFICE */
-  .po-wrap {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 24px;
-    flex: 1;
-    align-items: center;
-  }
-  .po-screen {
-    background: #0d0d18;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    font-family: monospace;
-    font-size: 12px;
-    line-height: 1.8;
-  }
-  .po-screen .title { color: var(--accent); font-size: 14px; font-weight: bold; margin-bottom: 8px; }
-  .po-dept { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
-  .po-dept .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .po-dept .status-dot.working { background: var(--accent2); }
-  .po-dept .status-dot.idle { background: var(--muted); }
-  .po-dept .dname { color: var(--text); font-size: 12px; flex: 1; }
-  .po-dept .dstatus { font-size: 10px; color: var(--muted); }
-  .po-info { display: flex; flex-direction: column; gap: 14px; }
-  .po-info-item { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .po-info-item strong { color: var(--text); display: block; margin-bottom: 3px; }
+.kpi .unit {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-left: 4px;
+  font-weight: 500;
+}
 
-  /* SLIDE 10 — END */
-  .end-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    gap: 20px;
-    text-align: center;
-  }
-  .end-icon { font-size: 56px; }
-  .end-tagline { font-size: 32px; font-weight: 800; line-height: 1.3; }
-  .end-sub { color: var(--muted); font-size: 15px; max-width: 500px; line-height: 1.7; }
-  .end-cmd {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 28px;
-    font-family: monospace;
-    font-size: 18px;
-    color: var(--accent);
-    letter-spacing: .05em;
-  }
+.kpi .hint {
+  font-size: 11px;
+  color: var(--text-soft);
+  margin-top: 6px;
+}
 
-  /* SLIDE NUM BADGE */
-  .slide-badge {
-    position: absolute;
-    top: 20px; right: 24px;
-    font-size: 11px;
-    color: var(--muted);
-    font-family: monospace;
-  }
+/* ---------- Card (chart container) ---------- */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  box-shadow: var(--card-shadow);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 960px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+.chart-wrap {
+  position: relative;
+  height: 320px;
+}
+
+.chart-wrap.tall {
+  height: 420px;
+}
+
+/* ---------- Table ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table th, table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+table th {
+  font-weight: 600;
+  color: var(--text-soft);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--bg-soft);
+}
+
+table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+table tbody tr:hover {
+  background: var(--bg-soft);
+}
+
+.rank {
+  display: inline-block;
+  min-width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  font-weight: 700;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.rank.gold { background: #fef3c7; color: #92400e; }
+.rank.silver { background: #e5e7eb; color: #374151; }
+.rank.bronze { background: #fde4cf; color: #9a3412; }
+
+.bar {
+  display: inline-block;
+  height: 6px;
+  background: var(--accent-2);
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pill.fukuoka { background: #dbeafe; color: #1e40af; }
+.pill.sapporo { background: #fce7f3; color: #9f1239; }
+
+.pill.occ-high { background: #dcfce7; color: #166534; }
+.pill.occ-mid { background: #fef3c7; color: #854d0e; }
+.pill.occ-low { background: #fee2e2; color: #991b1b; }
+
+/* ---------- Notice ---------- */
+.notice {
+  background: #fef9e7;
+  border: 1px solid #f5d76e;
+  color: #7a5e0e;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.notice strong { color: #6b4e0a; }
+
+footer {
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 11px;
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
 </style>
 </head>
 <body>
-
-<div class="deck">
-
-  <!-- ① COVER -->
-  <div class="slide cover active">
-    <div class="slide-badge">01 / 10</div>
-    <div class="cover-kicker">Starter Kit</div>
-    <h1>マイカンパニー<br>スターターキット</h1>
-    <div class="cover-body">
-      Claude Code で動く、自分だけの仮想組織システム。<br>
-      7部署・9スキルが最初から揃っている。
-    </div>
-    <div class="pill-row">
-      <span class="pill">🗂️ 秘書室</span>
-      <span class="pill">📊 マーケ</span>
-      <span class="pill">💻 開発部</span>
-      <span class="pill">📋 PM</span>
-      <span class="pill">🔍 リサーチ</span>
-      <span class="pill">💰 会計</span>
-      <span class="pill">🛡️ セキュリティ</span>
-    </div>
-    <div class="cover-accent">🏢</div>
+<header>
+  <div class="title">
+    LPM Pricing Dashboard
+    <span class="badge">READ-ONLY</span>
   </div>
+  <div class="subtitle" id="subtitle">Loading…</div>
+</header>
 
-  <!-- ② CONCEPT -->
-  <div class="slide">
-    <div class="slide-badge">02 / 10</div>
-    <div class="label">Concept</div>
-    <h2>このキットが解決すること</h2>
-    <div class="concept-grid">
-      <div class="concept-card">
-        <div class="concept-icon">🧠</div>
-        <div class="concept-title">記憶が続かない問題</div>
-        <div class="concept-desc">タスク・日記・会議録・アイデアをすべてMarkdownファイルに永続化。Claude が毎回「どこ？」と迷わない。</div>
+<main>
+
+  <!-- ==================== KPI ==================== -->
+  <section>
+    <h2>全体KPI</h2>
+    <div class="kpi-grid" id="kpi-grid"></div>
+  </section>
+
+  <!-- ==================== 月別推移 ==================== -->
+  <section>
+    <h2>月別推移（4月 → 5月 → 6月）</h2>
+    <div class="notice" style="margin-bottom: 16px;">
+      <strong>💡 読み方:</strong> 5月・6月は現時点の確定予約ベース。今後の予約獲得で数字は上振れします。
+      月が進むほどOCCが下がって見えるのは「未来の予約はまだ埋まっていない」だけで、稼働悪化ではありません。
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h2 style="font-size:13px; margin-bottom:10px;">売上推移（全体）</h2>
+        <div class="chart-wrap"><canvas id="chart-sales"></canvas></div>
       </div>
-      <div class="concept-card">
-        <div class="concept-icon">🔀</div>
-        <div class="concept-title">何でも屋になってしまう問題</div>
-        <div class="concept-desc">7つの部署に役割を分けて委任。秘書・PM・開発を「別人格」として使い分けられる。</div>
-      </div>
-      <div class="concept-card">
-        <div class="concept-icon">⚡</div>
-        <div class="concept-title">毎回セットアップが面倒な問題</div>
-        <div class="concept-desc">CLAUDE.md にルールを集約。新しい会話でもコンテキストが即復活する。</div>
-      </div>
-      <div class="concept-card">
-        <div class="concept-icon">🔌</div>
-        <div class="concept-title">専門タスクに対応できない問題</div>
-        <div class="concept-desc">必要なスキルを後からインストールして拡張できる。自分だけの組織に育てられる。</div>
+      <div class="card">
+        <h2 style="font-size:13px; margin-bottom:10px;">稼働率（OCC）と ADR 推移</h2>
+        <div class="chart-wrap"><canvas id="chart-occ-adr"></canvas></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ③ DEPARTMENTS -->
-  <div class="slide">
-    <div class="slide-badge">03 / 10</div>
-    <div class="label">Structure</div>
-    <h2>7つの部署</h2>
-    <div class="dept-grid">
-      <div class="dept-card accent">
-        <div class="icon">🗂️</div>
-        <div class="name">秘書室</div>
-        <div class="role">タスク・メモ・日記・議事録・アイデア管理。毎日の起点になる中核部署。</div>
+  <!-- ==================== エリア別 ==================== -->
+  <section>
+    <h2>エリア別サマリ</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h2 style="font-size:13px; margin-bottom:10px;">エリア別売上（4月）</h2>
+        <div class="chart-wrap"><canvas id="chart-area-sales"></canvas></div>
       </div>
-      <div class="dept-card">
-        <div class="icon">📊</div>
-        <div class="name">マーケティング</div>
-        <div class="role">コンテンツ企画・LP・施策管理。キャンペーンの設計と記録。</div>
-      </div>
-      <div class="dept-card">
-        <div class="icon">💻</div>
-        <div class="name">開発部</div>
-        <div class="role">技術ドキュメント・デバッグログ・スクリプト管理。</div>
-      </div>
-      <div class="dept-card">
-        <div class="icon">📋</div>
-        <div class="name">PM</div>
-        <div class="role">プロジェクト管理・チケット管理。要件定義から進捗追跡まで。</div>
-      </div>
-      <div class="dept-card">
-        <div class="icon">🔍</div>
-        <div class="name">リサーチ部</div>
-        <div class="role">市場調査・競合分析・トレンドリサーチの蓄積庫。</div>
-      </div>
-      <div class="dept-card">
-        <div class="icon">💰</div>
-        <div class="name">会計部</div>
-        <div class="role">PL・CF・BS・経費・予算のテンプレートが揃っている。</div>
-      </div>
-      <div class="dept-card">
-        <div class="icon">🛡️</div>
-        <div class="name">セキュリティ</div>
-        <div class="role">設定監査・危険コマンドのブロック設定管理。</div>
-      </div>
-      <div class="dept-card" style="background:transparent; border-color:transparent; align-items:center; justify-content:center; color:var(--muted); font-size:13px; text-align:center;">
-        + 追加は<br>フォルダを置くだけ
+      <div class="card">
+        <h2 style="font-size:13px; margin-bottom:10px;">エリア別部屋数</h2>
+        <div class="chart-wrap"><canvas id="chart-area-rooms"></canvas></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ④ SKILLS -->
-  <div class="slide">
-    <div class="slide-badge">04 / 10</div>
-    <div class="label">Skills</div>
-    <h2>9つの組み込みスキル</h2>
-    <div class="skills-grid">
-      <div class="skill-card">
-        <div class="skill-icon purple">🎯</div>
-        <div>
-          <div class="skill-name">/coordinator</div>
-          <div class="skill-desc">複数部署にまたがる依頼を受けて全体を指揮する司令塔。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon purple">💻</div>
-        <div>
-          <div class="skill-name">/developer</div>
-          <div class="skill-desc">コード実装・バグ修正・リファクタリングを担うエンジニア。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon purple">🏗️</div>
-        <div>
-          <div class="skill-name">/system-architect</div>
-          <div class="skill-desc">システム設計・技術スタック選定・アーキテクチャ設計。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon green">📋</div>
-        <div>
-          <div class="skill-name">/product-manager</div>
-          <div class="skill-desc">PRD・要件定義・ユーザーストーリー・優先度付け。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon green">📐</div>
-        <div>
-          <div class="skill-name">/breakdown-plan</div>
-          <div class="skill-desc">Epic → Feature → Story の階層でタスク分解・実行計画を生成。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon orange">💡</div>
-        <div>
-          <div class="skill-name">/marketing-ideas</div>
-          <div class="skill-desc">SaaS・プロダクトのグロース施策アイデアを網羅的に出す。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon orange">🎨</div>
-        <div>
-          <div class="skill-name">/ui-ux-pro-max</div>
-          <div class="skill-desc">50+スタイル・161パレット対応のUI/UXデザインインテリジェンス。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon pink">🛡️</div>
-        <div>
-          <div class="skill-name">/security-review</div>
-          <div class="skill-desc">OWASP準拠のコードセキュリティ監査。脆弱性を信頼スコア付きで報告。</div>
-        </div>
-      </div>
-      <div class="skill-card">
-        <div class="skill-icon green">🔌</div>
-        <div>
-          <div class="skill-name">/find-skills</div>
-          <div class="skill-desc">足りないスキルを検索してインストール。組織を自分用に拡張できる。</div>
-        </div>
-      </div>
+  <!-- ==================== TOP10: 売上 ==================== -->
+  <section>
+    <h2>売上TOP10（4月）</h2>
+    <div class="card">
+      <div class="chart-wrap tall"><canvas id="chart-top-sales"></canvas></div>
     </div>
-  </div>
+  </section>
 
-  <!-- ⑤ SETUP -->
-  <div class="slide">
-    <div class="slide-badge">05 / 10</div>
-    <div class="label">Setup</div>
-    <h2>セットアップ手順（5分）</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">リポジトリをクローン</div>
-          <div class="step-detail"><span class="code">git clone https://github.com/YOUR_REPO/teru-company-starter.git mycompany</span></div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Claude Code を起動</div>
-          <div class="step-detail">プロジェクトフォルダで <span class="code">claude</span> を実行。または VS Code の Claude Code 拡張から開く。</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">オーナープロフィールを設定</div>
-          <div class="step-detail"><span class="code">.company/CLAUDE.md</span> を開き、「事業・活動」「目標・課題」を書き換える。これだけで完了。</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <div class="step-title">日本語で話しかける</div>
-          <div class="step-detail">「タスク追加 〇〇」「アイデア 〇〇」「MTG 〇〇」と送るだけで動き始める。</div>
-        </div>
-      </div>
+  <!-- ==================== TOP10: ADR ==================== -->
+  <section>
+    <h2>ADR（1泊単価）TOP10（4月）</h2>
+    <div class="card">
+      <div class="chart-wrap tall"><canvas id="chart-top-adr"></canvas></div>
     </div>
-  </div>
+  </section>
 
-  <!-- ⑥ COMMANDS -->
-  <div class="slide">
-    <div class="slide-badge">06 / 10</div>
-    <div class="label">Usage</div>
-    <h2>よく使うコマンド</h2>
-    <div class="cmd-grid">
-      <div class="cmd-group">
-        <div class="cmd-group-title">日常タスク管理</div>
-        <div class="cmd-row"><span class="cmd">タスク追加 [内容]</span><span class="desc">今日のTODOに追加</span></div>
-        <div class="cmd-row"><span class="cmd">今日のタスク</span><span class="desc">TODOを表示</span></div>
-        <div class="cmd-row"><span class="cmd">メモ [内容]</span><span class="desc">inboxにクイックキャプチャ</span></div>
-        <div class="cmd-row"><span class="cmd">日記</span><span class="desc">今日の日記を書く</span></div>
-        <div class="cmd-row"><span class="cmd">週次レビュー</span><span class="desc">週次レビューを生成</span></div>
-      </div>
-      <div class="cmd-group">
-        <div class="cmd-group-title">企画・プロジェクト</div>
-        <div class="cmd-row"><span class="cmd">アイデア [タイトル]</span><span class="desc">アイデアファイル新規作成</span></div>
-        <div class="cmd-row"><span class="cmd">MTG [タイトル]</span><span class="desc">議事録ファイル新規作成</span></div>
-        <div class="cmd-row"><span class="cmd">調査 [タイトル]</span><span class="desc">リサーチファイル新規作成</span></div>
-        <div class="cmd-row"><span class="cmd">ダッシュボード</span><span class="desc">全体概要を表示</span></div>
-        <div class="cmd-row"><span class="cmd">ブリーフィング</span><span class="desc">最新ニュースのまとめ</span></div>
-      </div>
-      <div class="cmd-group">
-        <div class="cmd-group-title">スキル直接呼び出し</div>
-        <div class="cmd-row"><span class="cmd">/developer</span><span class="desc">コード実装・バグ修正</span></div>
-        <div class="cmd-row"><span class="cmd">/product-manager</span><span class="desc">要件定義・PRD</span></div>
-        <div class="cmd-row"><span class="cmd">/breakdown-plan</span><span class="desc">タスク分解・実行計画</span></div>
-        <div class="cmd-row"><span class="cmd">/security-review</span><span class="desc">セキュリティ監査</span></div>
-      </div>
-      <div class="cmd-group">
-        <div class="cmd-group-title">拡張・カスタマイズ</div>
-        <div class="cmd-row"><span class="cmd">/find-skills</span><span class="desc">新スキルを検索・インストール</span></div>
-        <div class="cmd-row"><span class="cmd">/coordinator</span><span class="desc">複数部署をまたぐ大型依頼</span></div>
-        <div class="cmd-row"><span class="cmd">/marketing-ideas</span><span class="desc">施策アイデアブレスト</span></div>
-        <div class="cmd-row"><span class="cmd">/ui-ux-pro-max</span><span class="desc">UI/UXデザイン</span></div>
-      </div>
+  <!-- ==================== 全物件テーブル ==================== -->
+  <section>
+    <h2>全物件一覧（4月ベース、売上降順）</h2>
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table id="property-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>物件</th>
+            <th>エリア</th>
+            <th class="num">部屋数</th>
+            <th class="num">OCC 4月</th>
+            <th class="num">ADR 4月</th>
+            <th class="num">売上 4月</th>
+            <th class="num">売上 5月</th>
+            <th class="num">売上 6月</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
-  </div>
+  </section>
 
-  <!-- ⑦ STRUCTURE -->
-  <div class="slide">
-    <div class="slide-badge">07 / 10</div>
-    <div class="label">Files</div>
-    <h2>ディレクトリ構成</h2>
-    <div class="tree">
-      <div class="tree-col">
-        <div><span class="d">mycompany/</span></div>
-        <div>├── <span class="f">CLAUDE.md</span> <span class="cm">← 全体ルール</span></div>
-        <div>├── <span class="f">README.md</span></div>
-        <div>├── <span class="f">.gitignore</span></div>
-        <div>└── <span class="d">.agents/skills/</span></div>
-        <div>&nbsp;&nbsp;&nbsp; ├── coordinator/</div>
-        <div>&nbsp;&nbsp;&nbsp; ├── developer/</div>
-        <div>&nbsp;&nbsp;&nbsp; ├── system-architect/</div>
-        <div>&nbsp;&nbsp;&nbsp; ├── product-manager/</div>
-        <div>&nbsp;&nbsp;&nbsp; ├── breakdown-plan/</div>
-        <div>&nbsp;&nbsp;&nbsp; ├── marketing-ideas/</div>
-        <div>&nbsp;&nbsp;&nbsp; ├── ui-ux-pro-max/</div>
-        <div>&nbsp;&nbsp;&nbsp; ├── security-review/</div>
-        <div>&nbsp;&nbsp;&nbsp; └── find-skills/</div>
-      </div>
-      <div class="tree-col">
-        <div><span class="d">.company/</span></div>
-        <div>├── <span class="f">CLAUDE.md</span> <span class="cm">← 組織ルール</span></div>
-        <div>├── <span class="d">secretary/</span> <span class="cm">← todos, diary, ideas…</span></div>
-        <div>├── <span class="d">marketing/</span> <span class="cm">← content-plan, lp…</span></div>
-        <div>├── <span class="d">engineering/</span> <span class="cm">← docs, scripts…</span></div>
-        <div>├── <span class="d">pm/</span> <span class="cm">← projects, tickets…</span></div>
-        <div>├── <span class="d">research/</span> <span class="cm">← topics…</span></div>
-        <div>├── <span class="d">finance/</span> <span class="cm">← pl, cf, bs…</span></div>
-        <div>├── <span class="d">security/</span></div>
-        <div>└── <span class="d">pixel-office/</span> <span class="cm">← 稼働状況ダッシュボード</span></div>
-      </div>
+  <!-- ==================== 営業利益率について ==================== -->
+  <section>
+    <h2>営業利益率について（Phase B）</h2>
+    <div class="notice">
+      <strong>⚠️ 今フェーズでは「営業利益率」を算出していません。</strong><br>
+      現在取得できているのは<strong>売上データのみ</strong>で、家賃・人件費・OTA手数料・清掃費などのコスト情報は
+      このスプシの範囲外にあります（別スプシ or 会計システム側）。<br><br>
+      次のステップ（Phase B）:
+      <ol style="margin: 6px 0 0 20px; padding: 0;">
+        <li>コストデータの所在確認（家賃台帳・人件費管理・Trip.com手数料算出用シートなど）</li>
+        <li>物件別コスト構造の把握</li>
+        <li>本ダッシュボードに「営業利益率」セクション追加</li>
+      </ol>
     </div>
-  </div>
+  </section>
 
-  <!-- ⑧ MAINTENANCE -->
-  <div class="slide">
-    <div class="slide-badge">08 / 10</div>
-    <div class="label">Maintenance</div>
-    <h2>運用・保守のしかた</h2>
-    <div class="maint-grid">
-      <div class="maint-card">
-        <div class="maint-title">🔄 日次メンテナンス</div>
-        <div class="maint-list">
-          <div class="maint-item">「今日のタスク」で秘書室の状態確認</div>
-          <div class="maint-item">完了タスクはチェック→秘書が自動アーカイブ</div>
-          <div class="maint-item">メモ・アイデアは inbox に投げるだけでOK</div>
-        </div>
-      </div>
-      <div class="maint-card">
-        <div class="maint-title">📅 週次メンテナンス</div>
-        <div class="maint-list">
-          <div class="maint-item">「週次レビュー」で1週間の成果を振り返る</div>
-          <div class="maint-item">pixel-office の <span class="code">update_data.py</span> を実行して稼働状況を更新</div>
-          <div class="maint-item">古い inbox のメモを各部署に仕分け</div>
-        </div>
-      </div>
-      <div class="maint-card">
-        <div class="maint-title">🔌 スキルの追加・更新</div>
-        <div class="maint-list">
-          <div class="maint-item"><span class="code">/find-skills</span> でスキルを検索・インストール</div>
-          <div class="maint-item">古いスキルは <span class="code">.agents/skills/</span> から手動削除</div>
-          <div class="maint-item">部署追加は <span class="code">.company/新部署/CLAUDE.md</span> を置くだけ</div>
-        </div>
-      </div>
-      <div class="maint-card">
-        <div class="maint-title">🛡️ セキュリティ</div>
-        <div class="maint-list">
-          <div class="maint-item">APIキー・パスワードは絶対にファイルに書かない</div>
-          <div class="maint-item">環境変数 or <span class="code">.env</span>（.gitignoreに追加済み）を使う</div>
-          <div class="maint-item"><span class="code">/security-review</span> でコードを定期監査</div>
-        </div>
-      </div>
-    </div>
-  </div>
+</main>
 
-  <!-- ⑨ PIXEL OFFICE -->
-  <div class="slide">
-    <div class="slide-badge">09 / 10</div>
-    <div class="label">Bonus</div>
-    <h2>バーチャルオフィス（pixel-office）</h2>
-    <div class="po-wrap">
-      <div class="po-screen">
-        <div class="title">🏢 マイカンパニー ダッシュボード</div>
-        <div class="po-dept"><span class="status-dot working"></span><span class="dname">🗂️ 秘書室</span><span class="dstatus">● WORKING</span></div>
-        <div class="po-dept"><span class="status-dot working"></span><span class="dname">📊 マーケティング</span><span class="dstatus">● WORKING</span></div>
-        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">💻 開発部</span><span class="dstatus">◌ IDLE</span></div>
-        <div class="po-dept"><span class="status-dot working"></span><span class="dname">📋 PM</span><span class="dstatus">● BUSY</span></div>
-        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">🔍 リサーチ部</span><span class="dstatus">◌ IDLE</span></div>
-        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">💰 会計部</span><span class="dstatus">◌ IDLE</span></div>
-        <div class="po-dept"><span class="status-dot idle"></span><span class="dname">🛡️ セキュリティ</span><span class="dstatus">✓ DONE</span></div>
-      </div>
-      <div class="po-info">
-        <div class="po-info-item">
-          <strong>起動方法</strong>
-          <span class="code">cd .company/pixel-office</span><br>
-          <span class="code">python3 server.py</span><br>
-          → <span class="code">http://localhost:8080</span> で確認
-        </div>
-        <div class="po-info-item">
-          <strong>データ更新</strong>
-          <span class="code">python3 update_data.py</span> を実行すると<br>
-          各部署のタスク状況が自動反映される
-        </div>
-        <div class="po-info-item">
-          <strong>カスタマイズ</strong>
-          <span class="code">data.json</span> を直接編集して<br>
-          独自の部署・ステータスを追加できる
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ⑩ END -->
-  <div class="slide">
-    <div class="slide-badge">10 / 10</div>
-    <div class="end-wrap">
-      <div class="end-icon">🚀</div>
-      <div class="end-tagline">あとはプロフィールを<br>書き換えるだけ</div>
-      <div class="end-sub">
-        <span class="code">.company/CLAUDE.md</span> の「オーナープロフィール」を<br>
-        自分の事業・目標に書き換えれば、組織が動き出す。
-      </div>
-      <div class="end-cmd">claude</div>
-    </div>
-  </div>
-
-</div>
-
-<!-- NAV -->
-<div class="nav">
-  <button id="prev" onclick="go(-1)" disabled>← 前へ</button>
-  <span class="slide-count" id="count">1 / 10</span>
-  <button id="next" onclick="go(1)">次へ →</button>
-</div>
+<footer>
+  Source: 新・統計(詳細)【直営】「共有｜表示用」シート / 読み取り専用・書き込み禁止 /
+  Generated by Claude Code
+</footer>
 
 <script>
-  const slides = document.querySelectorAll('.slide');
-  let cur = 0;
-  function go(d) {
-    slides[cur].classList.remove('active');
-    cur = Math.max(0, Math.min(slides.length - 1, cur + d));
-    slides[cur].classList.add('active');
-    document.getElementById('count').textContent = (cur + 1) + ' / ' + slides.length;
-    document.getElementById('prev').disabled = cur === 0;
-    document.getElementById('next').disabled = cur === slides.length - 1;
-  }
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
-  });
+const DATA = {"summary": {"fetched_at": "2026-04-09 11:51:27", "spreadsheet_title": "新・統計(詳細)【直営】", "total_properties": 30, "total_rooms": 636.0, "sales": {"m4_total": 222967414.45393255, "m5_total": 145008791.48548684, "m6_total": 22823214.3432151}, "weighted_occ": {"m4": 0.6729617982762635, "m5": 0.3530635017244878, "m6": 0.08820754716981133}, "weighted_adr": {"m4": 17364.913163484158, "m5": 20831.603431329815, "m6": 13561.030506960844}, "by_area": {"福岡": {"property_count": 24, "total_rooms": 512.0, "sales_m4": 213693515.2154058, "sales_m5": 129906527.00869171, "sales_m6": 16740584.009450234}, "札幌": {"property_count": 6, "total_rooms": 124.0, "sales_m4": 9273899.23852677, "sales_m5": 15102264.476795122, "sales_m6": 6082630.333764865}}}, "properties": [{"name": "RH3, 直営①", "brand": "RH3", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 12.0, "occ": {"m4": {"first": 0.9944444444444445, "last": 0.9444444444444444, "total": 0.9694444444444444}, "m5": {"first": 0.45, "last": 0.3385416666666667, "total": 0.3924731182795699}, "m6": {"first": 0.16111111111111112, "last": 0.05555555555555555, "total": 0.10833333333333334}}, "sales": {"m4": {"total": 5207651.083333333, "per_room": 433970.92361111107}, "m5": {"total": 2702432.428571428, "per_room": 225202.70238095234}, "m6": {"total": 403155.9047619048, "per_room": 33596.3253968254}}, "adr": {"m4": 15127.864708835341, "m5": 19136.18734793187, "m6": 15732.666666666668}}, {"name": "RH8, 直営①", "brand": "RH8", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 20.0, "occ": {"m4": {"first": 0.9733333333333334, "last": 0.7933333333333333, "total": 0.8833333333333333}, "m5": {"first": 0.5433333333333333, "last": 0.275, "total": 0.40483870967741936}, "m6": {"first": 0.06666666666666667, "last": 0.006666666666666667, "total": 0.03666666666666667}}, "sales": {"m4": {"total": 7963227.461842106, "per_room": 398161.37309210526}, "m5": {"total": 4555096.13655914, "per_room": 227754.80682795699}, "m6": {"total": 199768.09677419355, "per_room": 9988.404838709677}}, "adr": {"m4": 15024.957475173784, "m5": 18731.99676511955, "m6": 11876.2}}, {"name": "RH8, 直営②", "brand": "RH8", "operator": "直営②", "suffix": "", "area": "福岡", "rooms": 19.0, "occ": {"m4": {"first": 0.8210526315789474, "last": 0.7263157894736842, "total": 0.7736842105263158}, "m5": {"first": 0.4631578947368421, "last": 0.11842105263157894, "total": 0.28522920203735147}, "m6": {"first": 0.007017543859649123, "last": 0.0, "total": 0.0035087719298245615}}, "sales": {"m4": {"total": 7535659.166666667, "per_room": 396613.6403508772}, "m5": {"total": 4180460.8333333335, "per_room": 220024.25438596492}, "m6": {"total": 28125.0, "per_room": 1480.2631578947369}}, "adr": {"m4": 17087.662509448226, "m5": 24883.695436507936, "m6": 14062.5}}, {"name": "RH19, 直営①", "brand": "RH19", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 35.0, "occ": {"m4": {"first": 0.9866666666666667, "last": 0.88, "total": 0.9333333333333333}, "m5": {"first": 0.5161904761904762, "last": 0.28214285714285714, "total": 0.3953917050691244}, "m6": {"first": 0.022857142857142857, "last": 0.0038095238095238095, "total": 0.013333333333333334}}, "sales": {"m4": {"total": 17962771.487690374, "per_room": 513222.04250543925}, "m5": {"total": 8943731.150404857, "per_room": 255535.17572585307}, "m6": {"total": 246037.0, "per_room": 7029.628571428571}}, "adr": {"m4": 18536.784570932537, "m5": 21802.524107142854, "m6": 17574.071428571428}}, {"name": "RH19, 直営②", "brand": "RH19", "operator": "直営②", "suffix": "", "area": "福岡", "rooms": 1.0, "occ": {"m4": {"first": 0.4, "last": 0.8, "total": 0.6}, "m5": {"first": 0.7333333333333333, "last": 0.625, "total": 0.6774193548387096}, "m6": {"first": 0.0, "last": 0.26666666666666666, "total": 0.13333333333333333}}, "sales": {"m4": {"total": 1085308.25, "per_room": 1085308.25}, "m5": {"total": 1430959.75, "per_room": 1430959.75}, "m6": {"total": 276597.0, "per_room": 276597.0}}, "adr": {"m4": 60294.90277777778, "m5": 68140.94047619047, "m6": 69149.25}}, {"name": "RH20, 直営①", "brand": "RH20", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 31.0, "occ": {"m4": {"first": 0.9698924731182795, "last": 0.8731182795698925, "total": 0.921505376344086}, "m5": {"first": 0.4924731182795699, "last": 0.40725806451612906, "total": 0.44849115504682624}, "m6": {"first": 0.04946236559139785, "last": 0.0, "total": 0.024731182795698924}}, "sales": {"m4": {"total": 11385435.997619046, "per_room": 367272.1289554531}, "m5": {"total": 7210456.765800866, "per_room": 232595.37954196343}, "m6": {"total": 318951.6103896104, "per_room": 10288.761625471303}}, "adr": {"m4": 13285.22286770017, "m5": 16729.59806450317, "m6": 13867.461321287408}}, {"name": "RH20, 直営②", "brand": "RH20", "operator": "直営②", "suffix": "", "area": "福岡", "rooms": 2.0, "occ": {"m4": {"first": 0.9333333333333333, "last": 0.7666666666666667, "total": 0.85}, "m5": {"first": 0.4666666666666667, "last": 0.5, "total": 0.4838709677419355}, "m6": {"first": 0.03333333333333333, "last": 0.1, "total": 0.06666666666666667}}, "sales": {"m4": {"total": 974495.3333333333, "per_room": 487247.6666666666}, "m5": {"total": 891827.0, "per_room": 445913.5}, "m6": {"total": 121915.0, "per_room": 60957.5}}, "adr": {"m4": 26472.252873563215, "m5": 29727.566666666666, "m6": 30478.75}}, {"name": "GRHH, 直営①", "brand": "GRHH", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 65.0, "occ": {"m4": {"first": 0.9958974358974358, "last": 0.9097435897435897, "total": 0.9528205128205128}, "m5": {"first": 0.5302564102564102, "last": 0.3625, "total": 0.4436724565756824}, "m6": {"first": 0.13025641025641024, "last": 0.08717948717948718, "total": 0.10871794871794872}}, "sales": {"m4": {"total": 25209063.882043507, "per_room": 387831.7520314386}, "m5": {"total": 14963576.949882906, "per_room": 230208.87615204472}, "m6": {"total": 2539098.2035802994, "per_room": 39063.04928585076}}, "adr": {"m4": 16578.38869480695, "m5": 18976.816868386246, "m6": 15219.75161982826}}, {"name": "GRHT, 直営①", "brand": "GRHT", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 68.0, "occ": {"m4": {"first": 0.7225490196078431, "last": 0.7068627450980393, "total": 0.7147058823529412}, "m5": {"first": 0.46176470588235297, "last": 0.16176470588235295, "total": 0.3069259962049336}, "m6": {"first": 0.00980392156862745, "last": 0.01764705882352941, "total": 0.013725490196078431}}, "sales": {"m4": {"total": 27875765.952380948, "per_room": 409937.73459383746}, "m5": {"total": 16246817.147619048, "per_room": 238923.78158263306}, "m6": {"total": 636284.6666666666, "per_room": 9357.127450980392}}, "adr": {"m4": 19440.323599986477, "m5": 25291.511168154764, "m6": 22724.452380952378}}, {"name": "GRHT, 直営②", "brand": "GRHT", "operator": "直営②", "suffix": "", "area": "福岡", "rooms": 6.0, "occ": {"m4": {"first": 0.6444444444444445, "last": 0.4777777777777778, "total": 0.5611111111111111}, "m5": {"first": 0.34444444444444444, "last": 0.375, "total": 0.3602150537634409}, "m6": {"first": 0.022222222222222223, "last": 0.12222222222222222, "total": 0.07222222222222222}}, "sales": {"m4": {"total": 4320479.2, "per_room": 720079.8666666667}, "m5": {"total": 2985367.0, "per_room": 497561.1666666667}, "m6": {"total": 482414.3076923077, "per_room": 80402.38461538461}}, "adr": {"m4": 42777.02178217822, "m5": 68034.24324324324, "m6": 82968.0}}, {"name": "MK, 福岡代行, 直営①", "brand": "MK", "operator": "福岡代行", "suffix": "直営①", "area": "福岡", "rooms": 24.0, "occ": {"m4": {"first": 0.9722222222222222, "last": 0.7805555555555556, "total": 0.8763888888888889}, "m5": {"first": 0.4027777777777778, "last": 0.17447916666666666, "total": 0.2849462365591398}, "m6": {"first": 0.03611111111111111, "last": 0.0, "total": 0.018055555555555554}}, "sales": {"m4": {"total": 12422544.416666668, "per_room": 517606.0173611112}, "m5": {"total": 6559958.166666667, "per_room": 273331.5902777778}, "m6": {"total": 355822.0, "per_room": 14825.916666666666}}, "adr": {"m4": 19687.075145272058, "m5": 30943.19889937107, "m6": 27370.923076923078}}, {"name": "MK, 福岡代行, 直営②", "brand": "MK", "operator": "福岡代行", "suffix": "直営②", "area": "福岡", "rooms": 2.0, "occ": {"m4": {"first": 0.9, "last": 0.6666666666666666, "total": 0.7833333333333333}, "m5": {"first": 0.5666666666666667, "last": 0.625, "total": 0.5967741935483871}, "m6": {"first": 0.03333333333333333, "last": 0.0, "total": 0.016666666666666666}}, "sales": {"m4": {"total": 1579282.0, "per_room": 789641.0}, "m5": {"total": 1646668.0, "per_room": 823334.0}, "m6": {"total": 49999.0, "per_room": 24999.5}}, "adr": {"m4": 33601.744680851065, "m5": 44504.54054054054, "m6": 49999.0}}, {"name": "直営, RHM①", "brand": "直営", "operator": "RHM①", "suffix": "", "area": "福岡", "rooms": 21.0, "occ": {"m4": {"first": 0.9873015873015873, "last": 0.780952380952381, "total": 0.8841269841269841}, "m5": {"first": 0.42857142857142855, "last": 0.047619047619047616, "total": 0.23195084485407066}, "m6": {"first": 0.05714285714285714, "last": 0.06031746031746032, "total": 0.05873015873015873}}, "sales": {"m4": {"total": 7646479.87990343, "per_room": 364118.089519211}, "m5": {"total": 2557122.2908424907, "per_room": 121767.72813535671}, "m6": {"total": 415982.6945054945, "per_room": 19808.69973835688}}, "adr": {"m4": 15606.055786543475, "m5": 20144.07799227799, "m6": 21834.65}}, {"name": "HEN, 直営①", "brand": "HEN", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 29.0, "occ": {"m4": {"first": 0.967816091954023, "last": 0.8206896551724138, "total": 0.8942528735632184}, "m5": {"first": 0.45977011494252873, "last": 0.3599137931034483, "total": 0.4082313681868743}, "m6": {"first": 0.052873563218390804, "last": 0.05057471264367816, "total": 0.05172413793103448}}, "sales": {"m4": {"total": 15294902.457142858, "per_room": 527410.4295566502}, "m5": {"total": 9421458.1, "per_room": 324877.86551724136}, "m6": {"total": 947279.4838709678, "per_room": 32664.80978865406}}, "adr": {"m4": 19659.25765699596, "m5": 25671.54795640327, "m6": 21050.655197132615}}, {"name": "RHEM, 直営①", "brand": "RHEM", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 30.0, "occ": {"m4": {"first": 0.9777777777777777, "last": 0.8444444444444444, "total": 0.9111111111111111}, "m5": {"first": 0.3844444444444444, "last": 0.10208333333333333, "total": 0.23870967741935484}, "m6": {"first": 0.02, "last": 0.02, "total": 0.02}}, "sales": {"m4": {"total": 20335870.5446299, "per_room": 677862.3514876633}, "m5": {"total": 7669622.683333334, "per_room": 255654.08944444446}, "m6": {"total": 408186.5, "per_room": 13606.216666666667}}, "adr": {"m4": 25790.532916905082, "m5": 34547.84992492493, "m6": 22677.027777777777}}, {"name": "RHSS, 直営①", "brand": "RHSS", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 35.0, "occ": {"m4": {"first": 0.2019047619047619, "last": 0.25523809523809526, "total": 0.22857142857142856}, "m5": {"first": 0.4419047619047619, "last": 0.20714285714285716, "total": 0.3207373271889401}, "m6": {"first": 0.06095238095238095, "last": 0.06285714285714286, "total": 0.06190476190476191}}, "sales": {"m4": {"total": 1838704.75, "per_room": 52534.421428571426}, "m5": {"total": 4625637.785714285, "per_room": 132161.07959183672}, "m6": {"total": 940142.2142857143, "per_room": 26861.20612244898}}, "adr": {"m4": 7661.269791666667, "m5": 13292.062602627257, "m6": 14463.726373626374}}, {"name": "RHSS, 直営②", "brand": "RHSS", "operator": "直営②", "suffix": "", "area": "福岡", "rooms": 10.0, "occ": {"m4": {"first": 0.38666666666666666, "last": 0.32666666666666666, "total": 0.3566666666666667}, "m5": {"first": 0.5266666666666666, "last": 0.08125, "total": 0.2967741935483871}, "m6": {"first": 0.03333333333333333, "last": 0.013333333333333334, "total": 0.023333333333333334}}, "sales": {"m4": {"total": 1297012.75, "per_room": 129701.275}, "m5": {"total": 1611760.0, "per_room": 161176.0}, "m6": {"total": 266441.0, "per_room": 26644.1}}, "adr": {"m4": 12121.614485981308, "m5": 17519.130434782608, "m6": 38063.0}}, {"name": "ONES, 直営①", "brand": "ONES", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 34.0, "occ": {"m4": {"first": 0.4176470588235294, "last": 0.6392156862745098, "total": 0.5284313725490196}, "m5": {"first": 0.6901960784313725, "last": 0.4485294117647059, "total": 0.5654648956356736}, "m6": {"first": 0.3607843137254902, "last": 0.5470588235294118, "total": 0.453921568627451}}, "sales": {"m4": {"total": 4496213.902564103, "per_room": 132241.58536953243}, "m5": {"total": 5940568.312820513, "per_room": 174722.59743589745}, "m6": {"total": 3467334.076923077, "per_room": 101980.41402714932}}, "adr": {"m4": 9361.486549707603, "m5": 14879.508624708626, "m6": 17831.660194174758}}, {"name": "RHSU, 直営①", "brand": "RHSU", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 24.0, "occ": {"m4": {"first": 0.2972222222222222, "last": 0.325, "total": 0.3111111111111111}, "m5": {"first": 0.5111111111111111, "last": 0.2994791666666667, "total": 0.4018817204301075}, "m6": {"first": 0.24722222222222223, "last": 0.3416666666666667, "total": 0.29444444444444445}}, "sales": {"m4": {"total": 1635675.4999999998, "per_room": 68153.14583333333}, "m5": {"total": 3877043.3333333335, "per_room": 161543.47222222222}, "m6": {"total": 2756048.5, "per_room": 114835.35416666667}}, "adr": {"m4": 7367.907657657656, "m5": 12966.70011148272, "m6": 13000.228773584906}}, {"name": "USLC, 直営①", "brand": "USLC", "operator": "直営①", "suffix": "", "area": "福岡", "rooms": 1.0, "occ": {"m4": {"first": 0.13333333333333333, "last": 0.26666666666666666, "total": 0.2}, "m5": {"first": 0.26666666666666666, "last": 0.0625, "total": 0.16129032258064516}, "m6": {"first": 0.0, "last": 0.13333333333333333, "total": 0.06666666666666667}}, "sales": {"m4": {"total": 66608.0, "per_room": 66608.0}, "m5": {"total": 113701.0, "per_room": 113701.0}, "m6": {"total": 35716.0, "per_room": 35716.0}}, "adr": {"m4": 11101.333333333334, "m5": 22740.2, "m6": 17858.0}}, {"name": "LHE, 福岡代行, 直営①", "brand": "LHE", "operator": "福岡代行", "suffix": "直営①", "area": "福岡", "rooms": 5.0, "occ": {"m4": {"first": 0.96, "last": 0.8266666666666667, "total": 0.8933333333333333}, "m5": {"first": 0.3333333333333333, "last": 0.175, "total": 0.25161290322580643}, "m6": {"first": 0.0, "last": 0.0, "total": 0.0}}, "sales": {"m4": {"total": 3162304.142857143, "per_room": 632460.8285714287}, "m5": {"total": 1052305.8571428573, "per_room": 210461.17142857146}, "m6": {"total": 0.0, "per_room": 0.0}}, "adr": {"m4": 23599.284648187637, "m5": 26982.20146520147, "m6": 0.0}}, {"name": "LHE, 福岡代行, 直営②", "brand": "LHE", "operator": "福岡代行", "suffix": "直営②", "area": "福岡", "rooms": 5.0, "occ": {"m4": {"first": 0.96, "last": 0.6933333333333334, "total": 0.8266666666666667}, "m5": {"first": 0.29333333333333333, "last": 0.2125, "total": 0.25161290322580643}, "m6": {"first": 0.02666666666666667, "last": 0.0, "total": 0.013333333333333334}}, "sales": {"m4": {"total": 4020309.2785714287, "per_room": 804061.8557142857}, "m5": {"total": 1520032.4, "per_room": 304006.48}, "m6": {"total": 69720.0, "per_room": 13944.0}}, "adr": {"m4": 36890.19087694484, "m5": 38975.18974358974, "m6": 34860.0}}, {"name": "福岡代行, LHP, 直営①", "brand": "福岡代行", "operator": "LHP", "suffix": "直営①", "area": "福岡", "rooms": 9.0, "occ": {"m4": {"first": 0.9703703703703703, "last": 0.7407407407407407, "total": 0.8555555555555555}, "m5": {"first": 0.3925925925925926, "last": 0.18055555555555555, "total": 0.2831541218637993}, "m6": {"first": 0.0, "last": 0.0, "total": 0.0}}, "sales": {"m4": {"total": 9881579.211494254, "per_room": 1097953.2457215837}, "m5": {"total": 4683434.666666667, "per_room": 520381.62962962966}, "m6": {"total": 0.0, "per_room": 0.0}}, "adr": {"m4": 45746.416013071896, "m5": 59283.98312236287, "m6": 0.0}}, {"name": "LH駅前, 福岡代行, 直営①", "brand": "LH駅前", "operator": "福岡代行", "suffix": "直営①", "area": "福岡", "rooms": 24.0, "occ": {"m4": {"first": 0.9333333333333333, "last": 0.8222222222222222, "total": 0.8777777777777778}, "m5": {"first": 0.5388888888888889, "last": 0.4348958333333333, "total": 0.4852150537634409}, "m6": {"first": 0.09722222222222222, "last": 0.025, "total": 0.06111111111111111}}, "sales": {"m4": {"total": 20496170.566666666, "per_room": 854007.1069444445}, "m5": {"total": 14516489.25, "per_room": 604853.71875}, "m6": {"total": 1775565.75, "per_room": 73981.90625}}, "adr": {"m4": 32430.649630801687, "m5": 40211.88157894737, "m6": 40353.767045454544}}, {"name": "RHK, 札幌代行, 直営①", "brand": "RHK", "operator": "札幌代行", "suffix": "直営①", "area": "札幌", "rooms": 10.0, "occ": {"m4": {"first": 0.23703703703703705, "last": 0.3037037037037037, "total": 0.27037037037037037}, "m5": {"first": 0.5185185185185185, "last": 0.1388888888888889, "total": 0.3225806451612903}, "m6": {"first": 0.06666666666666667, "last": 0.0, "total": 0.03333333333333333}}, "sales": {"m4": {"total": 791536.9999999999, "per_room": 79153.69999999998}, "m5": {"total": 1420837.0, "per_room": 142083.7}, "m6": {"total": 147668.0, "per_room": 14766.8}}, "adr": {"m4": 10842.972602739725, "m5": 15787.077777777778, "m6": 16407.555555555555}}, {"name": "RHK, 札幌代行, 直営②", "brand": "RHK", "operator": "札幌代行", "suffix": "直営②", "area": "札幌", "rooms": 11.0, "occ": {"m4": {"first": 0.2606060606060606, "last": 0.4303030303030303, "total": 0.34545454545454546}, "m5": {"first": 0.5151515151515151, "last": 0.16477272727272727, "total": 0.3343108504398827}, "m6": {"first": 0.21212121212121213, "last": 0.0, "total": 0.10606060606060606}}, "sales": {"m4": {"total": 1737834.1666666665, "per_room": 157984.92424242423}, "m5": {"total": 2119923.166666667, "per_room": 192720.2878787879}, "m6": {"total": 778217.0, "per_room": 70747.0}}, "adr": {"m4": 15244.159356725146, "m5": 18595.81725146199, "m6": 22234.77142857143}}, {"name": "RHL, 札幌代行, 直営①", "brand": "RHL", "operator": "札幌代行", "suffix": "直営①", "area": "札幌", "rooms": 19.0, "occ": {"m4": {"first": 0.4421052631578947, "last": 0.37894736842105264, "total": 0.4105263157894737}, "m5": {"first": 0.5403508771929825, "last": 0.2730263157894737, "total": 0.40237691001697795}, "m6": {"first": 0.1368421052631579, "last": 0.21403508771929824, "total": 0.17543859649122806}}, "sales": {"m4": {"total": 2047808.1837648656, "per_room": 107779.37809288767}, "m5": {"total": 3266141.198223694, "per_room": 171902.16832756286}, "m6": {"total": 1243596.3337648653, "per_room": 65452.438619203436}}, "adr": {"m4": 8295.91169154229, "m5": 13947.250485436894, "m6": 12332.377142857144}}, {"name": "札幌代行, SHO, 直営①", "brand": "札幌代行", "operator": "SHO", "suffix": "直営①", "area": "札幌", "rooms": 78.0, "occ": {"m4": {"first": 0.24957264957264957, "last": 0.347008547008547, "total": 0.2982905982905983}, "m5": {"first": 0.36153846153846153, "last": 0.125, "total": 0.23945409429280398}, "m6": {"first": 0.11538461538461539, "last": 0.11367521367521367, "total": 0.11452991452991453}}, "sales": {"m4": {"total": 4696719.888095239, "per_room": 60214.357539682554}, "m5": {"total": 8295363.111904762, "per_room": 106350.80912698412}, "m6": {"total": 3913149.0, "per_room": 50168.57692307692}}, "adr": {"m4": 6728.825054577706, "m5": 14327.052006743976, "m6": 14601.30223880597}}, {"name": "札幌代行, 直営, カブト125①", "brand": "札幌代行", "operator": "直営", "suffix": "カブト125①", "area": "札幌", "rooms": 4.0, "occ": {"m4": {"first": 0.0, "last": 0.0, "total": 0.0}, "m5": {"first": 0.0, "last": 0.0, "total": 0.0}, "m6": {"first": 0.0, "last": 0.0, "total": 0.0}}, "sales": {"m4": {"total": 0.0, "per_room": 0.0}, "m5": {"total": 0.0, "per_room": 0.0}, "m6": {"total": 0.0, "per_room": 0.0}}, "adr": {"m4": 0.0, "m5": 0.0, "m6": 0.0}}, {"name": "札幌代行, 直営, カブト125②", "brand": "札幌代行", "operator": "直営", "suffix": "カブト125②", "area": "札幌", "rooms": 2.0, "occ": {"m4": {"first": 0.0, "last": 0.0, "total": 0.0}, "m5": {"first": 0.0, "last": 0.0, "total": 0.0}, "m6": {"first": 0.0, "last": 0.0, "total": 0.0}}, "sales": {"m4": {"total": 0.0, "per_room": 0.0}, "m5": {"total": 0.0, "per_room": 0.0}, "m6": {"total": 0.0, "per_room": 0.0}}, "adr": {"m4": 0.0, "m5": 0.0, "m6": 0.0}}]};
+
+// ---------- Helpers ----------
+const fmtYen = (v) => v == null ? "—" : "¥" + Math.round(v).toLocaleString("ja-JP");
+const fmtYenM = (v) => v == null ? "—" : "¥" + (v / 1e6).toFixed(1) + "M";
+const fmtPct = (v) => v == null ? "—" : (v * 100).toFixed(1) + "%";
+const fmtNum = (v) => v == null ? "—" : Math.round(v).toLocaleString("ja-JP");
+
+const NAVY = "#1a3a7a";
+const NAVY_LIGHT = "#2563eb";
+const GRAY = "#94a3b8";
+const OK = "#15803d";
+const WARN = "#b45309";
+
+// ---------- Header ----------
+document.getElementById("subtitle").textContent =
+  `取得元: ${DATA.summary.spreadsheet_title} / 取得日時: ${DATA.summary.fetched_at} / 物件数: ${DATA.summary.total_properties} / 総部屋数: ${fmtNum(DATA.summary.total_rooms)}室`;
+
+// ---------- KPI ----------
+const s = DATA.summary;
+const kpis = [
+  {
+    label: "総物件数",
+    value: fmtNum(s.total_properties),
+    unit: "件",
+    hint: `福岡 ${s.by_area["福岡"]?.property_count ?? 0} / 札幌 ${s.by_area["札幌"]?.property_count ?? 0}`,
+  },
+  {
+    label: "総部屋数",
+    value: fmtNum(s.total_rooms),
+    unit: "室",
+    hint: `福岡 ${fmtNum(s.by_area["福岡"]?.total_rooms)} / 札幌 ${fmtNum(s.by_area["札幌"]?.total_rooms)}`,
+  },
+  {
+    label: "4月 売上（全体）",
+    value: fmtYenM(s.sales.m4_total),
+    hint: "確定ベース",
+  },
+  {
+    label: "4月 稼働率（加重平均）",
+    value: fmtPct(s.weighted_occ.m4),
+    hint: "部屋数で加重平均",
+  },
+  {
+    label: "4月 ADR（加重平均）",
+    value: fmtYen(s.weighted_adr.m4),
+    hint: "売上 ÷ 売れた室泊数",
+  },
+  {
+    label: "RevPAR 4月",
+    value: fmtYen(s.weighted_occ.m4 != null && s.weighted_adr.m4 != null
+      ? s.weighted_occ.m4 * s.weighted_adr.m4 : null),
+    hint: "OCC × ADR",
+  },
+];
+
+const kpiGrid = document.getElementById("kpi-grid");
+kpis.forEach(k => {
+  const el = document.createElement("div");
+  el.className = "kpi";
+  el.innerHTML = `
+    <div class="label">${k.label}</div>
+    <div class="value">${k.value}${k.unit ? `<span class="unit">${k.unit}</span>` : ""}</div>
+    ${k.hint ? `<div class="hint">${k.hint}</div>` : ""}
+  `;
+  kpiGrid.appendChild(el);
+});
+
+// ---------- Chart.js defaults ----------
+Chart.defaults.font.family = '-apple-system, "Hiragino Sans", sans-serif';
+Chart.defaults.font.size = 12;
+Chart.defaults.color = "#5a6b8c";
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.boxHeight = 12;
+Chart.defaults.plugins.legend.labels.padding = 14;
+
+// ---------- Chart: 売上推移 ----------
+new Chart(document.getElementById("chart-sales"), {
+  type: "bar",
+  data: {
+    labels: ["4月", "5月", "6月"],
+    datasets: [{
+      label: "売上（百万円）",
+      data: [s.sales.m4_total, s.sales.m5_total, s.sales.m6_total].map(v => v / 1e6),
+      backgroundColor: [NAVY, NAVY_LIGHT, GRAY],
+      borderRadius: 6,
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `¥${ctx.parsed.y.toFixed(1)}M`,
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { callback: (v) => `¥${v}M` },
+      },
+    },
+  },
+});
+
+// ---------- Chart: OCC & ADR ----------
+new Chart(document.getElementById("chart-occ-adr"), {
+  type: "line",
+  data: {
+    labels: ["4月", "5月", "6月"],
+    datasets: [
+      {
+        label: "OCC (%)",
+        data: [s.weighted_occ.m4, s.weighted_occ.m5, s.weighted_occ.m6].map(v => v == null ? null : v * 100),
+        borderColor: NAVY,
+        backgroundColor: "rgba(26, 58, 122, 0.1)",
+        yAxisID: "yOcc",
+        fill: true,
+        tension: 0.3,
+        borderWidth: 2,
+        pointRadius: 5,
+      },
+      {
+        label: "ADR (円)",
+        data: [s.weighted_adr.m4, s.weighted_adr.m5, s.weighted_adr.m6],
+        borderColor: "#b45309",
+        backgroundColor: "rgba(180, 83, 9, 0.1)",
+        yAxisID: "yAdr",
+        fill: false,
+        tension: 0.3,
+        borderWidth: 2,
+        pointRadius: 5,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    scales: {
+      yOcc: {
+        type: "linear",
+        position: "left",
+        min: 0,
+        max: 100,
+        title: { display: true, text: "OCC (%)" },
+        ticks: { callback: (v) => v + "%" },
+      },
+      yAdr: {
+        type: "linear",
+        position: "right",
+        beginAtZero: true,
+        title: { display: true, text: "ADR (円)" },
+        grid: { drawOnChartArea: false },
+        ticks: { callback: (v) => "¥" + (v / 1000) + "k" },
+      },
+    },
+  },
+});
+
+// ---------- Chart: エリア別売上 ----------
+const areaNames = Object.keys(s.by_area);
+new Chart(document.getElementById("chart-area-sales"), {
+  type: "doughnut",
+  data: {
+    labels: areaNames,
+    datasets: [{
+      data: areaNames.map(a => s.by_area[a].sales_m4),
+      backgroundColor: [NAVY, "#db2777"],
+      borderWidth: 2,
+      borderColor: "#ffffff",
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "bottom" },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const v = ctx.parsed;
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            return `${ctx.label}: ¥${(v / 1e6).toFixed(1)}M (${((v / total) * 100).toFixed(1)}%)`;
+          },
+        },
+      },
+    },
+  },
+});
+
+// ---------- Chart: エリア別部屋数 ----------
+new Chart(document.getElementById("chart-area-rooms"), {
+  type: "doughnut",
+  data: {
+    labels: areaNames,
+    datasets: [{
+      data: areaNames.map(a => s.by_area[a].total_rooms),
+      backgroundColor: [NAVY, "#db2777"],
+      borderWidth: 2,
+      borderColor: "#ffffff",
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "bottom" },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const v = ctx.parsed;
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            return `${ctx.label}: ${v}室 (${((v / total) * 100).toFixed(1)}%)`;
+          },
+        },
+      },
+    },
+  },
+});
+
+// ---------- TOP10 データ準備 ----------
+const sortedBySales = [...DATA.properties]
+  .filter(p => p.sales.m4.total != null)
+  .sort((a, b) => b.sales.m4.total - a.sales.m4.total);
+
+const top10Sales = sortedBySales.slice(0, 10);
+
+const sortedByAdr = [...DATA.properties]
+  .filter(p => p.adr.m4 != null && p.adr.m4 > 0)
+  .sort((a, b) => b.adr.m4 - a.adr.m4)
+  .slice(0, 10);
+
+// ---------- Chart: TOP10 売上 ----------
+new Chart(document.getElementById("chart-top-sales"), {
+  type: "bar",
+  data: {
+    labels: top10Sales.map(p => p.name),
+    datasets: [{
+      label: "4月売上（百万円）",
+      data: top10Sales.map(p => p.sales.m4.total / 1e6),
+      backgroundColor: top10Sales.map(p => p.area === "札幌" ? "#db2777" : NAVY),
+      borderRadius: 4,
+    }],
+  },
+  options: {
+    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const p = top10Sales[ctx.dataIndex];
+            return [
+              `売上: ¥${ctx.parsed.x.toFixed(1)}M`,
+              `OCC: ${fmtPct(p.occ.m4.total)}`,
+              `ADR: ${fmtYen(p.adr.m4)}`,
+              `部屋数: ${p.rooms}室`,
+            ];
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        ticks: { callback: (v) => `¥${v}M` },
+      },
+    },
+  },
+});
+
+// ---------- Chart: TOP10 ADR ----------
+new Chart(document.getElementById("chart-top-adr"), {
+  type: "bar",
+  data: {
+    labels: sortedByAdr.map(p => p.name),
+    datasets: [{
+      label: "4月ADR（円）",
+      data: sortedByAdr.map(p => p.adr.m4),
+      backgroundColor: sortedByAdr.map(p => p.area === "札幌" ? "#db2777" : NAVY),
+      borderRadius: 4,
+    }],
+  },
+  options: {
+    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const p = sortedByAdr[ctx.dataIndex];
+            return [
+              `ADR: ${fmtYen(p.adr.m4)}`,
+              `OCC: ${fmtPct(p.occ.m4.total)}`,
+              `売上: ¥${(p.sales.m4.total / 1e6).toFixed(1)}M`,
+            ];
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        ticks: { callback: (v) => `¥${(v / 1000).toFixed(0)}k` },
+      },
+    },
+  },
+});
+
+// ---------- Table: 全物件 ----------
+const tbody = document.querySelector("#property-table tbody");
+const sorted = [...DATA.properties]
+  .filter(p => p.sales.m4.total != null)
+  .sort((a, b) => b.sales.m4.total - a.sales.m4.total);
+
+const occClass = (occ) => {
+  if (occ == null) return "";
+  if (occ >= 0.8) return "occ-high";
+  if (occ >= 0.5) return "occ-mid";
+  return "occ-low";
+};
+
+sorted.forEach((p, i) => {
+  const rankCls = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+  const areaCls = p.area === "札幌" ? "sapporo" : "fukuoka";
+  const occ4 = p.occ.m4.total;
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><span class="rank ${rankCls}">${i + 1}</span></td>
+    <td><strong>${p.name}</strong></td>
+    <td><span class="pill ${areaCls}">${p.area}</span></td>
+    <td class="num">${fmtNum(p.rooms)}</td>
+    <td class="num"><span class="pill ${occClass(occ4)}">${fmtPct(occ4)}</span></td>
+    <td class="num">${fmtYen(p.adr.m4)}</td>
+    <td class="num"><strong>${fmtYenM(p.sales.m4.total)}</strong></td>
+    <td class="num">${fmtYenM(p.sales.m5.total)}</td>
+    <td class="num">${fmtYenM(p.sales.m6.total)}</td>
+  `;
+  tbody.appendChild(tr);
+});
 </script>
 </body>
 </html>
