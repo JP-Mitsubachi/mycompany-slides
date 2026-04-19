@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BI × 予約台帳 整合性チェックマニュアル</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.7; }
+  .container { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+  .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 32px; }
+  h2 { font-size: 1.1rem; font-weight: 700; margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #1a1a1a; }
+  h3 { font-size: 0.95rem; font-weight: 700; margin: 20px 0 8px; }
+  p, li { font-size: 0.9rem; }
+  ul, ol { padding-left: 1.5em; margin: 8px 0; }
+  li { margin: 4px 0; }
+
+  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; color: #fff; }
+  .badge-green { background: #16a34a; }
+  .badge-blue { background: #2563eb; }
+  .badge-orange { background: #ea580c; }
+  .badge-gray { background: #6b7280; }
+
+  .formula-box { background: #f8f8f8; border: 1px solid #d0d0d0; border-radius: 6px; padding: 12px 16px; margin: 8px 0; font-family: 'SF Mono', 'Menlo', monospace; font-size: 0.82rem; line-height: 1.6; overflow-x: auto; white-space: pre-wrap; word-break: break-all; position: relative; }
+  .formula-box .copy-btn { position: absolute; top: 6px; right: 6px; background: #e0e0e0; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.7rem; cursor: pointer; }
+  .formula-box .copy-btn:hover { background: #d0d0d0; }
+  .formula-box .copy-btn.copied { background: #16a34a; color: #fff; }
+
+  .expect { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px 14px; margin: 8px 0; font-size: 0.85rem; }
+  .expect strong { color: #16a34a; }
+
+  .warn { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 10px 14px; margin: 8px 0; font-size: 0.85rem; }
+
+  .check-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+  .check-table th, .check-table td { border: 1px solid #e0e0e0; padding: 8px 10px; text-align: left; }
+  .check-table th { background: #f8f8f8; font-weight: 600; }
+  .check-table td:last-child { text-align: center; }
+  .check-input { width: 100px; border: 1px solid #d0d0d0; border-radius: 4px; padding: 4px 8px; font-size: 0.85rem; text-align: right; }
+  .result-cell { font-weight: 700; min-width: 40px; }
+  .result-ok { color: #16a34a; }
+  .result-ng { color: #dc2626; }
+  .result-pending { color: #9ca3af; }
+
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #1a1a1a; color: #fff; border-radius: 50%; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+
+  .step { display: flex; gap: 12px; margin: 12px 0; align-items: flex-start; }
+  .step-content { flex: 1; }
+
+  .btn { display: inline-block; background: #1a1a1a; color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 0.85rem; cursor: pointer; }
+  .btn:hover { background: #333; }
+  .btn-outline { background: #fff; color: #1a1a1a; border: 1px solid #d0d0d0; }
+  .btn-outline:hover { background: #f5f5f5; }
+
+  .summary-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
+
+  .footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 48px; padding: 16px 0; border-top: 1px solid #e0e0e0; }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    .check-input { width: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>BI × 予約台帳 整合性チェックマニュアル</h1>
+<p class="subtitle">予約BIダッシュボードの数値が予約台帳（スプレッドシート）と一致しているかを手動で確認する手順書（タブ01・タブ02 両対応）</p>
+
+<!-- ========== 概要 ========== -->
+<div class="summary-box">
+  <strong>このマニュアルでやること</strong>
+  <ol>
+    <li>予約台帳のスプシで COUNTIFS / SUMIFS を使い、件数・金額を集計する</li>
+    <li>BIダッシュボードのタブ01（KPI/帯別）・タブ02（ブッキングカーブ）の表示値と比較する</li>
+    <li>差分が許容範囲内か判定する</li>
+  </ol>
+  <p style="margin-top:8px; font-size:0.82rem; color:#555;">所要時間: 約15〜20分 / 必要なもの: 予約台帳スプシへのアクセス、BIダッシュボードURL</p>
+</div>
+
+<!-- ========== 前提 ========== -->
+<h2>0. 前提知識</h2>
+
+<div class="card">
+  <h3>BIの2つの集計軸</h3>
+  <table class="check-table">
+    <tr><th>軸</th><th>BIの場所</th><th>台帳の列</th><th>意味</th></tr>
+    <tr><td><strong>予約月ベース</strong></td><td>タブ01 KPIカード・帯別表</td><td>E列（予約日）</td><td>いつ予約されたか</td></tr>
+    <tr><td><strong>CI月ベース</strong></td><td>タブ02 ブッキングカーブ</td><td>F列（チェックイン日）</td><td>いつ泊まるか</td></tr>
+  </table>
+  <p style="margin-top:8px; font-size:0.82rem; color:#666;">同じ「2026/01の件数」でも軸が違うと数字が大きく変わります（例: 予約月=14,432 vs CI月=10,891）。BIのどの画面を見ているかで使い分けてください。</p>
+</div>
+
+<div class="card">
+  <h3>許容範囲（合否ライン）</h3>
+  <table class="check-table">
+    <tr><th>指標</th><th>許容範囲</th><th>補足</th></tr>
+    <tr><td>件数</td><td>±0.1%（約15件以内）</td><td>BIキャッシュ更新〜現在の差分</td></tr>
+    <tr><td>金額（adrSum）</td><td>±0.5%</td><td>同上</td></tr>
+    <tr><td>キャンセル率（CR）</td><td>±0.5pt</td><td>直近月ほどズレやすい</td></tr>
+    <tr><td>NR比率</td><td>±0.2pt</td><td></td></tr>
+  </table>
+</div>
+
+<div class="warn">
+  <strong>⚠️ 注意:</strong> 台帳のE列（予約日）・F列（CI日）は<strong>日付型</strong>です。ワイルドカード（"2026/01*"）は使えません。必ず <code>DATE()</code> 関数で比較してください。
+</div>
+
+<!-- ========== チェック1: CI月件数 ========== -->
+<h2>1. CI月ベース 件数チェック（最も確実）</h2>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-green">推奨</span>
+    <strong>ブッキングカーブの total と台帳を突合</strong>
+  </div>
+  <p>CI月ベースは過去確定データのため、BIと台帳が完全一致します。まずここから確認するのが一番確実です。</p>
+
+  <div class="step">
+    <span class="step-num">1</span>
+    <div class="step-content">スプシ「予約メール(当月分)」を開き、<strong>任意の空きセル</strong>（BI_サマリーシートの空き行など）に以下を入力:</div>
+  </div>
+
+  <h3>2026年1月（CI月）</h3>
+  <div class="formula-box" id="f1">=COUNTIFS(予約台帳!F2:F150000,">="&DATE(2026,1,1),予約台帳!F2:F150000,"<"&DATE(2026,2,1))<button class="copy-btn" onclick="copyFormula('f1')">コピー</button></div>
+  <div class="expect">期待値: <strong>10,891</strong>（BIブッキングカーブ 2026/01 total）</div>
+
+  <h3>2026年2月（CI月）</h3>
+  <div class="formula-box" id="f2">=COUNTIFS(予約台帳!F2:F150000,">="&DATE(2026,2,1),予約台帳!F2:F150000,"<"&DATE(2026,3,1))<button class="copy-btn" onclick="copyFormula('f2')">コピー</button></div>
+  <div class="expect">期待値: <strong>12,931</strong></div>
+
+  <h3>2026年3月（CI月）</h3>
+  <div class="formula-box" id="f3">=COUNTIFS(予約台帳!F2:F150000,">="&DATE(2026,3,1),予約台帳!F2:F150000,"<"&DATE(2026,4,1))<button class="copy-btn" onclick="copyFormula('f3')">コピー</button></div>
+  <div class="expect">期待値: <strong>15,937</strong></div>
+
+  <div class="step" style="margin-top:16px;">
+    <span class="step-num">2</span>
+    <div class="step-content">BIダッシュボードを開き、<strong>タブ02（ブッキングカーブ）</strong>でエリア=全体、該当月を選択して <strong>total</strong> の値を確認。上の数式結果と一致すればOK。</div>
+  </div>
+</div>
+
+<!-- ========== チェック2: 予約月件数 ========== -->
+<h2>2. 予約月ベース 件数チェック</h2>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-blue">タブ01</span>
+    <strong>KPIカード「総予約件数」と台帳を突合</strong>
+  </div>
+
+  <h3>2026年1月（予約月）</h3>
+  <div class="formula-box" id="f4">=COUNTIFS(予約台帳!E2:E150000,">="&DATE(2026,1,1),予約台帳!E2:E150000,"<"&DATE(2026,2,1))<button class="copy-btn" onclick="copyFormula('f4')">コピー</button></div>
+  <div class="expect">期待値: <strong>14,432</strong>前後（BIキャッシュ時点では14,425。差分はキャッシュ以降の新規予約分）</div>
+
+  <h3>2026年2月（予約月）</h3>
+  <div class="formula-box" id="f5">=COUNTIFS(予約台帳!E2:E150000,">="&DATE(2026,2,1),予約台帳!E2:E150000,"<"&DATE(2026,3,1))<button class="copy-btn" onclick="copyFormula('f5')">コピー</button></div>
+  <div class="expect">期待値: <strong>13,110</strong>前後（BI: 13,107）</div>
+
+  <h3>2026年3月（予約月）</h3>
+  <div class="formula-box" id="f6">=COUNTIFS(予約台帳!E2:E150000,">="&DATE(2026,3,1),予約台帳!E2:E150000,"<"&DATE(2026,4,1))<button class="copy-btn" onclick="copyFormula('f6')">コピー</button></div>
+  <div class="expect">期待値: <strong>14,449</strong>前後（BI: 14,439）</div>
+
+  <p style="margin-top:12px; font-size:0.82rem; color:#666;">BIダッシュボードのタブ01で、エリア=全体、対象月を選択 →「総予約件数」と比較してください。</p>
+</div>
+
+<!-- ========== チェック3: キャンセル・NR ========== -->
+<h2>3. キャンセル件数・NR件数チェック</h2>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-orange">CR・NR</span>
+    <strong>キャンセル率とNR比率の突合</strong>
+  </div>
+
+  <h3>キャンセル件数（2026年1月・予約月）</h3>
+  <div class="formula-box" id="f7">=COUNTIFS(予約台帳!E2:E150000,">="&DATE(2026,1,1),予約台帳!E2:E150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"キャンセル")<button class="copy-btn" onclick="copyFormula('f7')">コピー</button></div>
+  <div class="expect">期待値: <strong>3,678</strong>前後（BI: 3,671）→ CR = キャンセル ÷ 全件 = 約25.5%</div>
+
+  <h3>NR件数（2026年1月・予約月）</h3>
+  <div class="formula-box" id="f8">=COUNTIFS(予約台帳!E2:E150000,">="&DATE(2026,1,1),予約台帳!E2:E150000,"<"&DATE(2026,2,1),予約台帳!Q2:Q150000,"返金不可")<button class="copy-btn" onclick="copyFormula('f8')">コピー</button></div>
+  <div class="expect">期待値: <strong>4,555</strong>（BIと完全一致）→ NR% = NR ÷ 全件 = 約31.6%</div>
+
+  <p style="margin-top:12px; font-size:0.82rem; color:#666;">BIダッシュボードのタブ01「キャンセル率」「NR比率」と比較。月を変える場合はDATE関数の月を変更してください。</p>
+</div>
+
+<!-- ========== チェック4: ADR ========== -->
+<h2>4. ADR（1泊単価）チェック</h2>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-blue">ADR</span>
+    <strong>ADR 1泊の平均値を突合</strong>
+  </div>
+
+  <h3>ADR合計（有効予約のみ・2026年1月）</h3>
+  <div class="formula-box" id="f9">=SUMIFS(予約台帳!N2:N150000,予約台帳!E2:E150000,">="&DATE(2026,1,1),予約台帳!E2:E150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"確認済み")<button class="copy-btn" onclick="copyFormula('f9')">コピー</button></div>
+  <div class="expect">期待値: 約 <strong>¥211,963,933</strong>（BI adrSum: ¥212,090,964 ← 差分0.06%）</div>
+
+  <h3>有効件数（2026年1月）</h3>
+  <div class="formula-box" id="f10">=COUNTIFS(予約台帳!E2:E150000,">="&DATE(2026,1,1),予約台帳!E2:E150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"確認済み")<button class="copy-btn" onclick="copyFormula('f10')">コピー</button></div>
+  <div class="expect">期待値: <strong>10,754</strong></div>
+
+  <p style="margin-top:8px;">ADR平均 = ADR合計 ÷ 有効件数。BIのADR 1泊の値と比較してください。</p>
+
+  <div class="warn">
+    <strong>⚠️ BIのADR平均の注意点:</strong> BIは「ADR合計（有効のみ）÷ 全件数（キャンセル含む）」で計算しているため、スプシで「÷ 有効件数」で出した値より低く表示されます。これはBIの仕様であり不整合ではありません。
+  </div>
+</div>
+
+<!-- ========== チェック5: LT帯 ========== -->
+<h2>5. LT帯（リードタイム帯）別チェック</h2>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-gray">LT帯</span>
+    <strong>帯別詳細表の件数を突合</strong>
+  </div>
+
+  <h3>LT帯 0〜5日の件数（全期間）</h3>
+  <div class="formula-box" id="f11">=COUNTIF(予約台帳!X2:X150000,"0〜5日")<button class="copy-btn" onclick="copyFormula('f11')">コピー</button></div>
+  <div class="expect">期待値: <strong>25,822</strong></div>
+
+  <p style="margin-top:8px; font-size:0.82rem; color:#666;">X列（LT帯_7）で各帯をカウント。BIの帯別テーブルの合計行と比較。他の帯は「0〜5日」を「6〜14日」「15〜21日」等に変えてください。</p>
+
+  <div class="warn">
+    <strong>⚠️ LT帯NULLについて:</strong> BIはLT帯が空の予約（約1,923件）を除外して集計しています。そのためBIの「総予約件数」とLT帯合計には差が出ます。これは正常な動作です。
+  </div>
+</div>
+
+<!-- ========== チェック6: ブッキングカーブ ========== -->
+<h2>6. ブッキングカーブ（タブ02）チェック</h2>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-green">タブ02</span>
+    <strong>CI月別の total / active / CR / ADR を突合</strong>
+  </div>
+  <p>ブッキングカーブは<strong>CI月（チェックイン月）</strong>で集計しています。過去月は完全一致するので、ここが合っていれば「BIは正しく集計している」と確定できます。</p>
+
+  <h3>CI月 total件数（章1と同じ）</h3>
+  <div class="formula-box" id="bc1">=COUNTIFS(予約台帳!F2:F150000,">="&DATE(2026,1,1),予約台帳!F2:F150000,"<"&DATE(2026,2,1))<button class="copy-btn" onclick="copyFormula('bc1')">コピー</button></div>
+  <div class="expect">期待値: <strong>10,891</strong>（BIブッキングカーブ 2026/01 total）</div>
+
+  <h3>CI月 final_active（有効件数）</h3>
+  <div class="formula-box" id="bc2">=COUNTIFS(予約台帳!F2:F150000,">="&DATE(2026,1,1),予約台帳!F2:F150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"確認済み")<button class="copy-btn" onclick="copyFormula('bc2')">コピー</button></div>
+  <div class="expect">期待値: <strong>10,314</strong>（BI final_active）</div>
+
+  <h3>CI月 キャンセル件数</h3>
+  <div class="formula-box" id="bc3">=COUNTIFS(予約台帳!F2:F150000,">="&DATE(2026,1,1),予約台帳!F2:F150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"キャンセル")<button class="copy-btn" onclick="copyFormula('bc3')">コピー</button></div>
+  <div class="expect">期待値: <strong>577</strong>（total 10,891 - active 10,314）→ CR = 577/10,891 = <strong>5.30%</strong></div>
+
+  <h3>CI月 ADR平均（BIと同条件: 有効 + LT≥0）</h3>
+  <div class="formula-box" id="bc4">=AVERAGEIFS(予約台帳!N2:N150000,予約台帳!F2:F150000,">="&DATE(2026,1,1),予約台帳!F2:F150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"確認済み",予約台帳!V2:V150000,">=0")<button class="copy-btn" onclick="copyFormula('bc4')">コピー</button></div>
+  <div class="expect">期待値: <strong>¥13,064</strong>（BI curve ADR と完全一致）</div>
+  <div class="warn" style="margin-top:6px;">
+    <strong>⚠️ 必ずステータスとLTのフィルターを付ける:</strong> BIの curve ADR は「確認済み + LT≥0」で集計されています。フィルターを外すと数円ズレます（手動作成予約でLTマイナスのものが混入するため）。
+  </div>
+
+  <h3>他の月で確認する場合</h3>
+  <p style="font-size:0.85rem;"><code>DATE(2026,1,1)</code>の <strong>1</strong> を対象月に、<code>DATE(2026,2,1)</code>の <strong>2</strong> を翌月にするだけです。例えば2026年3月なら:</p>
+  <div class="formula-box" id="bc5">=COUNTIFS(予約台帳!F2:F150000,">="&DATE(2026,3,1),予約台帳!F2:F150000,"<"&DATE(2026,4,1))<button class="copy-btn" onclick="copyFormula('bc5')">コピー</button></div>
+  <div class="expect">期待値: <strong>15,937</strong>（BI 2026/03 total）</div>
+
+  <div class="warn">
+    <strong>⚠️ 過去月は完全一致、未来月はキャッシュラグが出ます:</strong> 2026/04以降の月は新規予約がこれからも入ってくるので、BIキャッシュ更新時点以降の差が必ず出ます（例: 2026/04で +178件）。これは構造的に当然の差です。
+  </div>
+
+  <div class="warn" style="background:#f0f9ff; border-color:#bae6fd;">
+    <strong>💡 ブッキングカーブの読み方:</strong> 「CI月ごとに、チェックインの何日前に何件予約が入っていたか」を時系列で見るグラフ。例えば2026/01の総予約10,891件のうち、CI 30日前には約7,000件、15日前には約8,500件…と積み上がっていく軌跡を描いています。プライシングの「いつから売れ始めるか」の判断に使えます。
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="badge badge-orange">ADR変動</span>
+    <strong>ADR推移・ADR変動の確認方法</strong>
+  </div>
+  <p>BIの「<strong>ADR変動（90日前→当日）</strong>」は、CI月の予約について<strong>リードタイム（予約日→CI日の日数、V列）</strong>でフィルターしてADR平均を出しています。</p>
+
+  <h3>計算ロジック（BI）</h3>
+  <table class="check-table">
+    <tr><th>項目</th><th>条件</th></tr>
+    <tr><td>対象</td><td>F列（CI日）が対象月内</td></tr>
+    <tr><td>ステータス</td><td>T列=「確認済み」のみ（キャンセル除外）</td></tr>
+    <tr><td>リードタイム</td><td>V列 ≥ X日（Xは「何日前」の数字）</td></tr>
+    <tr><td>ADR値</td><td>N列（ADR_1泊）の単純平均</td></tr>
+  </table>
+
+  <h3>ADR 当日（2026/01・LT≥0）</h3>
+  <div class="formula-box" id="adr1">=AVERAGEIFS(予約台帳!N2:N150000,予約台帳!F2:F150000,">="&DATE(2026,1,1),予約台帳!F2:F150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"確認済み",予約台帳!V2:V150000,">=0")<button class="copy-btn" onclick="copyFormula('adr1')">コピー</button></div>
+  <div class="expect">期待値: <strong>¥13,064</strong>（BI ADR 当日と完全一致）</div>
+  <div class="warn" style="margin-top:6px;">
+    <strong>⚠️ V列(リードタイム)の ">=0" フィルター必須:</strong> 予約台帳にはリードタイムがマイナス（手動作成予約など、CI日より後に登録された予約）が存在します。BIはこれらを除外しているため、LT≥0 を明示しないと4円程度ズレます。
+  </div>
+
+  <h3>ADR 90日前（2026/01・LT≥90）</h3>
+  <div class="formula-box" id="adr2">=AVERAGEIFS(予約台帳!N2:N150000,予約台帳!F2:F150000,">="&DATE(2026,1,1),予約台帳!F2:F150000,"<"&DATE(2026,2,1),予約台帳!T2:T150000,"確認済み",予約台帳!V2:V150000,">=90")<button class="copy-btn" onclick="copyFormula('adr2')">コピー</button></div>
+  <div class="expect">期待値: <strong>¥27,124</strong>（BI ADR 90日前と完全一致）</div>
+
+  <h3>ADR変動 = 当日 − 90日前</h3>
+  <div class="formula-box" id="adr3">=13064-27124<button class="copy-btn" onclick="copyFormula('adr3')">コピー</button></div>
+  <div class="expect">期待値: <strong>-¥14,060</strong>（BI「ADR変動（90日前→当日）」と完全一致）</div>
+
+  <h3>他のLT点も同じ要領で</h3>
+  <p style="font-size:0.85rem;">数式の末尾 <code>">=90"</code> を変えるだけ。BIのグラフは <strong>0 / 1 / 3 / 5 / 7 / 9 / 12 / 15 / 18 / 21 / 25 / 30 / 35 / 40 / 45 / 50 / 60 / 75 / 90</strong> の19点で描かれています。</p>
+
+  <table class="check-table" style="margin-top:12px;">
+    <tr><th>LT点</th><th>BI表示</th><th>台帳で確認するとき</th></tr>
+    <tr><td>当日 (≥0)</td><td>¥13,064</td><td>V列の条件なしでOK</td></tr>
+    <tr><td>7日前 (≥7)</td><td>¥13,454</td><td><code>">=7"</code></td></tr>
+    <tr><td>30日前 (≥30)</td><td>¥14,235</td><td><code>">=30"</code></td></tr>
+    <tr><td>45日前 (≥45)</td><td>¥15,576</td><td><code>">=45"</code></td></tr>
+    <tr><td>60日前 (≥60)</td><td>¥18,243</td><td><code>">=60"</code></td></tr>
+    <tr><td>90日前 (≥90)</td><td>¥27,124</td><td><code>">=90"</code></td></tr>
+  </table>
+
+  <div class="warn" style="background:#f0f9ff; border-color:#bae6fd;">
+    <strong>💡 ADR推移の読み方:</strong> 「早く予約した人ほどADRが高い」＝早期予約の客は高単価層。2026/01の場合、90日前に予約した10件は平均¥27,124、当日直近に予約した層を含めると平均¥13,064まで下がる。これは「早割で安くしている」のではなく「直前ほど値下げ or 安いプランが残る」傾向を示しています。プライシング戦略の検証に直結する指標です。
+  </div>
+
+  <div class="warn">
+    <strong>⚠️ サンプル数が少ない点は誤差に注意:</strong> 90日前は10件、60日前は269件と、LT点が大きいほどN数が減ります。過去月（2025年など）はサンプル豊富ですが、未来月（2026/05以降）ほどN数が少なくADRは揺れやすいです。
+  </div>
+</div>
+
+<!-- ========== 判定シート ========== -->
+<h2>7. 判定シート（結果を記入）</h2>
+
+<div class="card">
+  <p style="margin-bottom:12px;">各チェックの結果を入力すると、自動で判定します。</p>
+
+  <table class="check-table" id="judge-table">
+    <tr>
+      <th>チェック項目</th>
+      <th>BI値</th>
+      <th>台帳の値（入力）</th>
+      <th>判定</th>
+    </tr>
+    <tr>
+      <td>CI月 2026/01 total</td>
+      <td>10,891</td>
+      <td><input class="check-input" type="number" data-bi="10891" data-threshold="0.001" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>CI月 2026/02 total</td>
+      <td>12,931</td>
+      <td><input class="check-input" type="number" data-bi="12931" data-threshold="0.001" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>CI月 2026/03 total</td>
+      <td>15,937</td>
+      <td><input class="check-input" type="number" data-bi="15937" data-threshold="0.001" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>予約月 2026/01 件数</td>
+      <td>14,425</td>
+      <td><input class="check-input" type="number" data-bi="14425" data-threshold="0.002" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>予約月 2026/01 キャンセル</td>
+      <td>3,671</td>
+      <td><input class="check-input" type="number" data-bi="3671" data-threshold="0.005" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>予約月 2026/01 NR件数</td>
+      <td>4,555</td>
+      <td><input class="check-input" type="number" data-bi="4555" data-threshold="0.002" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>予約月 2026/01 ADR合計(有効)</td>
+      <td>212,090,964</td>
+      <td><input class="check-input" type="number" data-bi="212090964" data-threshold="0.005" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr style="background:#f0fdf4;">
+      <td colspan="4" style="font-size:0.8rem; padding:6px 10px; font-weight:600;">── ブッキングカーブ（タブ02）──</td>
+    </tr>
+    <tr>
+      <td>CI月 2026/01 final_active</td>
+      <td>10,314</td>
+      <td><input class="check-input" type="number" data-bi="10314" data-threshold="0.001" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>CI月 2026/01 キャンセル</td>
+      <td>577</td>
+      <td><input class="check-input" type="number" data-bi="577" data-threshold="0.005" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>CI月 2026/01 ADR平均</td>
+      <td>13,064</td>
+      <td><input class="check-input" type="number" data-bi="13064" data-threshold="0.01" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>CI月 2026/02 final_active</td>
+      <td>11,029</td>
+      <td><input class="check-input" type="number" data-bi="11029" data-threshold="0.001" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>CI月 2026/03 final_active</td>
+      <td>12,958</td>
+      <td><input class="check-input" type="number" data-bi="12958" data-threshold="0.001" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr style="background:#fff7ed;">
+      <td colspan="4" style="font-size:0.8rem; padding:6px 10px; font-weight:600;">── ADR推移（CI月 2026/01）──</td>
+    </tr>
+    <tr>
+      <td>ADR 当日（LT≥0）</td>
+      <td>13,064</td>
+      <td><input class="check-input" type="number" data-bi="13064" data-threshold="0.01" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>ADR 30日前（LT≥30）</td>
+      <td>14,235</td>
+      <td><input class="check-input" type="number" data-bi="14235" data-threshold="0.01" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>ADR 90日前（LT≥90）</td>
+      <td>27,124</td>
+      <td><input class="check-input" type="number" data-bi="27124" data-threshold="0.01" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+    <tr>
+      <td>ADR変動 = 当日 − 90日前</td>
+      <td>-14,060</td>
+      <td><input class="check-input" type="number" data-bi="-14060" data-threshold="0.01" oninput="judge(this)"></td>
+      <td class="result-cell result-pending">—</td>
+    </tr>
+  </table>
+
+  <div id="overall-result" style="margin-top:16px; padding:12px 16px; border-radius:6px; background:#f8f8f8; font-weight:600; text-align:center;">
+    結果を入力してください
+  </div>
+</div>
+
+<!-- ========== FAQ ========== -->
+<h2>8. よくある質問</h2>
+
+<div class="card">
+  <h3>Q. 数式が0を返す</h3>
+  <p>日付列がテキスト形式の可能性があります。<code>">="&DATE(2026,1,1)</code> ではなく <code>"2026/01*"</code> のワイルドカードを試してください。逆に、日付型なのにワイルドカードを使った場合も0になります。</p>
+
+  <h3 style="margin-top:16px;">Q. BIと数十件ズレる</h3>
+  <p>BIの「データ更新」時刻を確認してください。BIはキャッシュ式のため、更新以降に入った予約・キャンセルの分だけ台帳と差が出ます。これは正常です。</p>
+
+  <h3 style="margin-top:16px;">Q. ADRがBIの値と全然違う</h3>
+  <p>BIの「ADR 1泊」= ADR合計(有効のみ) ÷ 全件数(キャンセル含む)。スプシで計算するときは分母を揃えてください。</p>
+
+  <h3 style="margin-top:16px;">Q. 数式の計算が終わらない</h3>
+  <p>14万行の集計は重いです。範囲を <code>F2:F150000</code> のように上限をつけると速くなります。<code>F:F</code> だと全行スキャンするので時間がかかります。</p>
+</div>
+
+<div class="footer">
+  BI × 予約台帳 整合性チェックマニュアル — LPM マーケティング部<br>
+  作成: 2026-04-17 / データ検証: AI(Claude) + 手動突合
+</div>
+
+</div>
+
+<script>
+function copyFormula(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent.replace('コピー', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'OK!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+function judge(input) {
+  const val = parseFloat(input.value);
+  const bi = parseFloat(input.dataset.bi);
+  const threshold = parseFloat(input.dataset.threshold);
+  const cell = input.parentElement.nextElementSibling;
+
+  if (isNaN(val) || input.value === '') {
+    cell.textContent = '—';
+    cell.className = 'result-cell result-pending';
+  } else {
+    const diff = Math.abs(val - bi) / Math.abs(bi);
+    if (diff <= threshold) {
+      cell.textContent = '✅ OK';
+      cell.className = 'result-cell result-ok';
+    } else {
+      cell.textContent = '⚠️ ' + (diff * 100).toFixed(2) + '%';
+      cell.className = 'result-cell result-ng';
+    }
+  }
+  updateOverall();
+}
+
+function updateOverall() {
+  const cells = document.querySelectorAll('#judge-table .result-cell');
+  let ok = 0, ng = 0, pending = 0;
+  cells.forEach(c => {
+    if (c.classList.contains('result-ok')) ok++;
+    else if (c.classList.contains('result-ng')) ng++;
+    else pending++;
+  });
+  const el = document.getElementById('overall-result');
+  if (pending === cells.length) {
+    el.textContent = '結果を入力してください';
+    el.style.background = '#f8f8f8';
+    el.style.color = '#666';
+  } else if (ng > 0) {
+    el.textContent = '⚠️ ' + ng + '件が許容範囲外 — BIのキャッシュ更新時刻を確認してください';
+    el.style.background = '#fef2f2';
+    el.style.color = '#dc2626';
+  } else if (pending > 0) {
+    el.textContent = '✅ ' + ok + '/' + cells.length + ' 件OK（残り' + pending + '件未入力）';
+    el.style.background = '#f0fdf4';
+    el.style.color = '#16a34a';
+  } else {
+    el.textContent = '✅ 全項目OK — BIと予約台帳の整合性が確認できました';
+    el.style.background = '#f0fdf4';
+    el.style.color = '#16a34a';
+  }
+}
+</script>
+
+</body>
+</html>
